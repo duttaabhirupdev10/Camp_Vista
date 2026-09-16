@@ -1,23 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Campground</title>
-</head>
-<body>
-    <h1>Edit Campground</h1>
-    <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="campground[title]" value="<%= campground.title %>" required><br><br>
-        
-        <label for="location">Location:</label>
-        <input type="text" id="location" name="campground[location]" value="<%= campground.location %>" required><br><br>
+<% layout('layouts/boilerplate') %>
+<div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+        <div class="mb-4">
+            <p class="text-uppercase text-secondary small fw-semibold mb-2">Campground details</p>
+            <h1 class="display-6 fw-bold mb-2">Edit campground</h1>
+            <p class="text-secondary mb-0">Update the information for <%= campground.title %>.</p>
+        </div>
 
-        <label for="description">Description:</label>
-        <textarea id="description" name="campground[description]" required><%= campground.description %></textarea><br><br>
-        
-        <button type="submit">Update Campground</button></form>
-        <a href="/campgrounds/<%= campground._id %>">Back to Campground</a>
-</body>
-</html>
+        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" class="border rounded-3 p-4 shadow-sm bg-white">
+            <div class="mb-3">
+                <label for="title" class="form-label fw-semibold">Title</label>
+                <input type="text" class="form-control" id="title" name="campground[title]" value="<%= campground.title %>" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label fw-semibold">Image URL</label>
+                <input type="url" class="form-control" id="image" name="campground[image]" value="<%= campground.image %>" required>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-7">
+                    <label for="location" class="form-label fw-semibold">Location</label>
+                    <input type="text" class="form-control" id="location" name="campground[location]" value="<%= campground.location %>" required>
+                </div>
+                <div class="col-md-5">
+                    <label for="price" class="form-label fw-semibold">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" class="form-control" id="price" name="campground[price]" value="<%= campground.price %>" min="0" placeholder="0" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 mb-4">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea class="form-control" id="description" name="campground[description]" rows="5" required><%= campground.description %></textarea>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-dark">Update campground</button>
+                <a href="/campgrounds/<%= campground._id %>" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
