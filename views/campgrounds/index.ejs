@@ -1,10 +1,12 @@
 <% layout('layouts/boilerplate') %>
     <h1>All Campgrounds</h1>
+  <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'owner')) { %>
   <div class="d-flex justify-content-end mb-3">
     <a href="/campgrounds/new" class="btn btn-success">
         <i class="bi bi-plus-lg"></i> Add New Campground
     </a>
-</div>
+  </div>
+  <% } %>
     <ul>
 <div class="row">
 

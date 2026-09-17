@@ -17,12 +17,14 @@
 
                 <p class="lh-lg flex-grow-1 mb-4"><%= campground.description %></p>
 
+                <% if (currentUser && (currentUser.role === 'admin' || campground.owner === currentUser.id)) { %>
                 <div class="d-flex flex-wrap gap-2">
                     <a href="/campgrounds/<%= campground._id %>/edit" class="btn btn-dark">Edit campground</a>
                     <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
                         <button type="submit" class="btn btn-outline-danger">Delete</button>
                     </form>
                 </div>
+                <% } %>
             </div>
         </div>
         <a href="/campgrounds" class="btn btn-link px-0 mt-3 text-decoration-none">&larr; All campgrounds</a>
