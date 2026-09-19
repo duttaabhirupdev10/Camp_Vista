@@ -9,6 +9,7 @@ const methodOverride = require("method-override");
 const session = require("express-session");
 const campgroundRoutes = require("./routes/campgroundRoutes");
 const authRoutes = require("./routes/authRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/", authRoutes);
+app.use("/", bookingRoutes);
 app.use("/campgrounds", campgroundRoutes);
 
 app.listen(3000, () => {

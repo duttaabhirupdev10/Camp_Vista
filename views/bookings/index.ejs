@@ -1,0 +1,54 @@
+<% layout('layouts/boilerplate') %>
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">My Bookings</h1>
+        
+        <% if (bookings && bookings.length > 0) { %>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <% for (let booking of bookings) { %>
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0">
+                            <% if(booking.campgrounds && booking.campgrounds.image) { %>
+                                <img src="<%= booking.campgrounds.image %>" class="card-img-top object-fit-cover" style="height: 200px;" alt="<%= booking.campgrounds.title %>">
+                            <% } else { %>
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <span class="text-white">No Image</span>
+                                </div>
+                            <% } %>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold"><%= booking.campgrounds ? booking.campgrounds.title : 'Campground Unavailable' %></h5>
+                                <p class="text-secondary small mb-3">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                    <%= booking.campgrounds ? booking.campgrounds.location : 'Unknown' %>
+                                </p>
+                                
+                                <div class="bg-light rounded p-3 mb-3 flex-grow-1">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted small fw-semibold">Check-in</span>
+                                        <span class="fw-bold"><%= new Date(booking.check_in).toLocaleDateString() %></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-muted small fw-semibold">Check-out</span>
+                                        <span class="fw-bold"><%= new Date(booking.check_out).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                                    <span class="text-muted">Total Price</span>
+                                    <span class="fs-5 fw-bold text-success">₹<%= booking.total_price %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info border-0 shadow-sm">
+                <h4 class="alert-heading">No bookings yet!</h4>
+                <p>You haven't made any bookings. Start exploring and find your next adventure!</p>
+                <hr>
+                <a href="/campgrounds" class="btn btn-primary">Explore Campgrounds</a>
+            </div>
+        <% } %>
+    </div>
+</div>

@@ -18,13 +18,41 @@
                 <p class="lh-lg flex-grow-1 mb-4"><%= campground.description %></p>
 
                 <% if (currentUser && (currentUser.role === 'admin' || campground.owner === currentUser.id)) { %>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="d-flex flex-wrap gap-2 mb-4">
                     <a href="/campgrounds/<%= campground._id %>/edit" class="btn btn-dark">Edit campground</a>
                     <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
                         <button type="submit" class="btn btn-outline-danger">Delete</button>
                     </form>
                 </div>
                 <% } %>
+
+                <!-- Booking Form -->
+                <div class="card shadow-sm border-0 bg-light mt-auto">
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">Book your stay</h5>
+                        <% if (currentUser) { %>
+                            <form action="/campgrounds/<%= campground.id %>/book" method="POST">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label for="check_in" class="form-label small text-secondary fw-semibold">Check-in</label>
+                                        <input type="date" class="form-control" id="check_in" name="check_in" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="check_out" class="form-label small text-secondary fw-semibold">Check-out</label>
+                                        <input type="date" class="form-control" id="check_out" name="check_out" required>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100 fw-bold py-2" type="submit">Book Now</button>
+                            </form>
+                        <% } else { %>
+                            <div class="text-center py-2">
+                                <p class="text-muted mb-2">You must be logged in to book.</p>
+                                <a href="/login" class="btn btn-outline-primary w-100">Login to Book</a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
             </div>
         </div>
         <a href="/campgrounds" class="btn btn-link px-0 mt-3 text-decoration-none">&larr; All campgrounds</a>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampVista</title>
+    <title>CampVista | North Bengal</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
@@ -21,8 +21,8 @@
             height: 100vh;
             background: linear-gradient(
                 rgba(15, 23, 42, 0.7), 
-                rgba(15, 23, 42, 0.9)
-            ), url('https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+                rgba(15, 23, 42, 0.8)
+            ), url('https://images.unsplash.com/photo-1582424161962-d249f3e9d891?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -54,7 +54,7 @@
             font-size: 4.5rem;
             font-weight: 800;
             margin-bottom: 1rem;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
+            background: linear-gradient(to right, #4ade80, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.05em;
@@ -83,14 +83,14 @@
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%);
             color: white;
-            box-shadow: 0 10px 20px -10px rgba(56, 189, 248, 0.5);
+            box-shadow: 0 10px 20px -10px rgba(74, 222, 128, 0.5);
         }
 
         .btn-primary-custom:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 25px -10px rgba(56, 189, 248, 0.7);
+            box-shadow: 0 15px 25px -10px rgba(74, 222, 128, 0.7);
             color: white;
         }
 
@@ -120,7 +120,7 @@
         .circle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(56,189,248,0.15) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(74,222,128,0.15) 0%, rgba(0,0,0,0) 70%);
         }
 
         .circle-1 {
@@ -135,7 +135,7 @@
             height: 800px;
             bottom: -300px;
             right: -200px;
-            background: radial-gradient(circle, rgba(129,140,248,0.15) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%);
         }
     </style>
 </head>
@@ -149,10 +149,10 @@
 
         <div class="glass-card position-relative" style="z-index: 2;">
             <h1 class="title">CampVista</h1>
-            <p class="subtitle">Discover the most breathtaking camping destinations around the world. Unplug, explore, and connect with nature like never before.</p>
+            <p class="subtitle">Discover the most breathtaking camping destinations across the Himalayas, Darjeeling, and the Dooars. Connect with nature like never before.</p>
             
             <div class="d-flex justify-content-center gap-4 flex-wrap">
-                <a href="/campgrounds" class="btn btn-custom btn-primary-custom text-decoration-none">Explore Campgrounds</a>
+                <a href="/campgrounds" class="btn btn-custom btn-primary-custom text-decoration-none">Explore North Bengal</a>
                 
                 <% if(currentUser) { %>
                     <form action="/logout" method="POST" class="d-inline">
