@@ -1,0 +1,32 @@
+<% layout('layouts/boilerplate') %>
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="row g-0 overflow-hidden border rounded-3 shadow-sm bg-white">
+            <div class="col-lg-7">
+                <img src="<%= campground.image %>" class="w-100 h-100 object-fit-cover" style="min-height: 420px;" alt="<%= campground.title %>">
+            </div>
+            <div class="col-lg-5 p-4 p-lg-5 d-flex flex-column">
+                <p class="text-uppercase text-secondary small fw-semibold mb-2">CampVista campground</p>
+                <h1 class="display-6 fw-bold mb-2"><%= campground.title %></h1>
+                <p class="text-secondary mb-4"><%= campground.location %></p>
+
+                <div class="border-top border-bottom py-3 mb-4">
+                    <span class="text-secondary small d-block">Price per night</span>
+                    <span class="fs-3 fw-semibold">₹<%= campground.price %></span>
+                </div>
+
+                <p class="lh-lg flex-grow-1 mb-4"><%= campground.description %></p>
+
+                <% if (currentUser && (currentUser.role === 'admin' || campground.owner === currentUser.id)) { %>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/campgrounds/<%= campground._id %>/edit" class="btn btn-dark">Edit campground</a>
+                    <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+                <% } %>
+            </div>
+        </div>
+        <a href="/campgrounds" class="btn btn-link px-0 mt-3 text-decoration-none">&larr; All campgrounds</a>
+    </div>
+</div>

@@ -1,5 +1,25 @@
-<footer class="footer bg-dark py-3 text-light mt-auto">
-  <div class="container">
-    <span class="text-light">&copy; 2026 CampVista</span>
+<style>
+  .footer-glass {
+    background: rgba(15, 23, 42, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .footer-text {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+  .footer-brand {
+    font-weight: 600;
+    color: #38bdf8;
+  }
+</style>
+
+<footer class="footer footer-glass py-4 mt-auto">
+  <div class="container text-center">
+    <span class="footer-text">
+      &copy; <%= new Date().getFullYear() %> <span class="footer-brand">CampVista</span>. All rights reserved.
+    </span>
   </div>
 </footer>
