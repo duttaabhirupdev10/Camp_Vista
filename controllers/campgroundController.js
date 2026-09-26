@@ -3,8 +3,12 @@ const campgroundService = require('../services/campgroundService');
 const campgroundController = {
     async index(req, res) {
         try {
-            const campgrounds = await campgroundService.listCampgrounds();
-            res.render('campgrounds/index', { campgrounds });
+            const filters = {
+                search: req.query.search || '',
+                maxPrice: req.query.maxPrice || ''
+            };
+            const campgrounds = await campgroundService.listCampgrounds(filters);
+            res.render('campgrounds/index', { campgrounds, filters });
         } catch (error) {
             console.error(error);
             res.send('Error fetching campgrounds');

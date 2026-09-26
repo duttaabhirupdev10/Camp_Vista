@@ -1,8 +1,18 @@
 const supabase = require('../utils/supabase');
 
 const campgroundModel = {
-    findAll() {
-        return supabase.from('campgrounds').select('*');
+    findAll(filters = {}) {
+        let query = supabase.from('campgrounds').select('*');
+
+        if (filters.search) {
+            query = query.or(`title.ilike.%${filters.search}%,location.ilike.%${filters.search}%`);
+        }
+        
+        if (filters.maxPrice) {
+            query = query.lte('price', filters.maxPrice);
+        }
+
+        return query;
     },
 
     findById(id) {

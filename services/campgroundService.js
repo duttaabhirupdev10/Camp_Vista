@@ -1,8 +1,8 @@
 const campgroundModel = require('../models/campgroundModel');
 
 const campgroundService = {
-    async listCampgrounds() {
-        const { data, error } = await campgroundModel.findAll();
+    async listCampgrounds(filters = {}) {
+        const { data, error } = await campgroundModel.findAll(filters);
         if (error) throw error;
 
         return data
@@ -11,7 +11,18 @@ const campgroundService = {
     },
 
     async getCampground(id) {
-        return campgroundModel.findById(id);
+        const reviewModel = require('../models/reviewModel');
+        const { data: campground, error: campError } = await campgroundModel.findById(id);
+        if (campError || !campground) return { error: campError };
+
+        const { data: reviews, error: revError } = await reviewModel.findByCampgroundId(id);
+        if (!revError && reviews) {
+            campground.reviews = reviews;
+        } else {
+            campground.reviews = [];
+        }
+
+        return { data: campground };
     },
 
     async createCampground(attributes, owner) {

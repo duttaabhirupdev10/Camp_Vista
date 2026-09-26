@@ -7,6 +7,22 @@
     </a>
   </div>
   <% } %>
+
+  <form action="/campgrounds" method="GET" class="mb-4">
+      <div class="row g-2">
+          <div class="col-md-6">
+              <input type="text" name="search" class="form-control" placeholder="Search by title or location..." value="<%= filters.search || '' %>">
+          </div>
+          <div class="col-md-4">
+              <input type="number" name="maxPrice" class="form-control" placeholder="Max Price (₹)" value="<%= filters.maxPrice || '' %>">
+          </div>
+          <div class="col-md-2 d-flex gap-2">
+              <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
+              <a href="/campgrounds" class="btn btn-secondary w-100">Clear</a>
+          </div>
+      </div>
+  </form>
+
     <ul>
 <div class="row">
 

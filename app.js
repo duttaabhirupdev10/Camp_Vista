@@ -10,6 +10,8 @@ const session = require("express-session");
 const campgroundRoutes = require("./routes/campgroundRoutes");
 const authRoutes = require("./routes/authRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const ownerRoutes = require("./routes/ownerRoutes");
 
 app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
@@ -32,8 +34,21 @@ app.use(session({
     saveUninitialized: false
 }));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     res.locals.currentUser = req.session ? req.session.user : null;
+    res.locals.pendingBookingsCount = 0;
+
+    if (req.session && req.session.user && (req.session.user.role === 'owner' || req.session.user.role === 'admin')) {
+        try {
+            const bookingModel = require('./models/bookingModel');
+            const { data } = await bookingModel.findBookingsByOwnerId(req.session.user.id);
+            if (data) {
+                res.locals.pendingBookingsCount = data.filter(b => b.status === 'pending').length;
+            }
+        } catch (err) {
+            console.error('Error fetching pending counts', err);
+        }
+    }
     next();
 });
 
@@ -43,7 +58,9 @@ app.get("/", (req, res) => {
 
 app.use("/", authRoutes);
 app.use("/", bookingRoutes);
+app.use("/", ownerRoutes);
 app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds/:id/reviews", reviewRoutes);
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");

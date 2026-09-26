@@ -1,4 +1,7 @@
 <% layout('layouts/boilerplate') %>
+<!-- Leaflet CSS for the map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
 <div class="row justify-content-center">
     <div class="col-xl-10">
         <div class="row g-0 overflow-hidden border rounded-3 shadow-sm bg-white">
@@ -8,7 +11,10 @@
             <div class="col-lg-5 p-4 p-lg-5 d-flex flex-column">
                 <p class="text-uppercase text-secondary small fw-semibold mb-2">CampVista campground</p>
                 <h1 class="display-6 fw-bold mb-2"><%= campground.title %></h1>
-                <p class="text-secondary mb-4"><%= campground.location %></p>
+                <p class="text-secondary mb-4">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i><%= campground.location %> 
+                    <span id="distanceBadge" class="badge bg-info text-dark ms-2 d-none">Calculating distance...</span>
+                </p>
 
                 <div class="border-top border-bottom py-3 mb-4">
                     <span class="text-secondary small d-block">Price per night</span>
@@ -55,6 +61,137 @@
 
             </div>
         </div>
+
+        <!-- MAP SECTION -->
+        <div class="mt-4 border rounded-3 overflow-hidden shadow-sm">
+            <div id="campgroundMap" style="height: 350px; width: 100%;"></div>
+        </div>
+
+        <!-- REVIEWS SECTION -->
+        <div class="mt-5">
+            <h3 class="fw-bold mb-4">Reviews</h3>
+            
+            <% 
+                let hasReviewed = false;
+                if (currentUser && campground.reviews) {
+                    hasReviewed = campground.reviews.some(r => r.author_id === currentUser.id);
+                }
+            %>
+
+            <% if (currentUser && !hasReviewed) { %>
+            <div class="card shadow-sm border-0 mb-4 bg-white p-4 rounded-3">
+                <h5 class="mb-3">Leave a Review</h5>
+                <form action="/campgrounds/<%= campground.id %>/reviews" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label" for="rating">Rating</label>
+                        <select class="form-select" name="review[rating]" id="rating" required>
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="3">3 - Average</option>
+                            <option value="2">2 - Poor</option>
+                            <option value="1">1 - Terrible</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="body">Review</label>
+                        <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
+                    </div>
+                    <button class="btn btn-success">Submit Review</button>
+                </form>
+            </div>
+            <% } else if (currentUser && hasReviewed) { %>
+                <div class="alert alert-info border-0 shadow-sm mb-4">
+                    <i class="bi bi-info-circle-fill me-2"></i> You have already reviewed this campground. Thank you for your feedback!
+                </div>
+            <% } %>
+
+            <div class="row">
+            <% if (campground.reviews && campground.reviews.length > 0) { %>
+                <% for(let review of campground.reviews) { %>
+                    <div class="col-md-6 mb-3">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <i class="bi bi-person-circle"></i> <%= review.users ? review.users.email : 'Anonymous' %>
+                                </h6>
+                                <p class="card-text mb-2">
+                                    <span class="badge bg-primary rounded-pill"><%= review.rating %> / 5 Stars</span>
+                                </p>
+                                <p class="card-text"><%= review.body %></p>
+                                <% if (currentUser && (review.author_id === currentUser.id || currentUser.role === 'admin')) { %>
+                                    <form action="/campgrounds/<%= campground.id %>/reviews/<%= review.id %>?_method=DELETE" method="POST">
+                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <p class="text-muted">No reviews yet. Be the first to leave one!</p>
+            <% } %>
+            </div>
+        </div>
+
         <a href="/campgrounds" class="btn btn-link px-0 mt-3 text-decoration-none">&larr; All campgrounds</a>
     </div>
 </div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    const campgroundLocation = "<%= campground.location %>";
+    const map = L.map('campgroundMap').setView([20.5937, 78.9629], 5); // Default to center of India
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const distanceBadge = document.getElementById('distanceBadge');
+
+    // 1. Geocode the campground location
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(campgroundLocation)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const campLat = parseFloat(data[0].lat);
+                const campLon = parseFloat(data[0].lon);
+                
+                // Center map and add marker
+                map.setView([campLat, campLon], 13);
+                L.marker([campLat, campLon]).addTo(map)
+                    .bindPopup(`<b><%= campground.title %></b><br>${campgroundLocation}`)
+                    .openPopup();
+
+                // 2. Get User Location & Calculate Distance
+                if ("geolocation" in navigator) {
+                    distanceBadge.classList.remove('d-none');
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        
+                        // Calculate distance (Leaflet built-in method)
+                        const userLatLng = L.latLng(userLat, userLon);
+                        const campLatLng = L.latLng(campLat, campLon);
+                        const distanceInMeters = userLatLng.distanceTo(campLatLng);
+                        const distanceInKm = (distanceInMeters / 1000).toFixed(1);
+                        
+                        distanceBadge.innerHTML = `<i class="bi bi-geo-fill"></i> ${distanceInKm} km away`;
+                        distanceBadge.classList.replace('bg-info', 'bg-success');
+                        distanceBadge.classList.replace('text-dark', 'text-white');
+                        
+                        // Optional: Add user marker to map
+                        // L.marker([userLat, userLon]).addTo(map).bindPopup("You are here");
+                    }, error => {
+                        distanceBadge.innerHTML = 'Location access denied';
+                        distanceBadge.classList.replace('bg-info', 'bg-secondary');
+                        distanceBadge.classList.replace('text-dark', 'text-white');
+                    });
+                }
+            } else {
+                console.log("Location not found on map");
+            }
+        })
+        .catch(error => console.error('Error fetching location:', error));
+</script>

@@ -80,6 +80,17 @@
           <a href="/login" class="nav-link nav-link-custom">Login</a>
           <a href="/register" class="btn btn-nav-action text-decoration-none">Register</a>
         <% } else { %>
+          <% if (currentUser.role === 'owner' || currentUser.role === 'admin') { %>
+            <a href="/manage-bookings" class="nav-link nav-link-custom position-relative me-3">
+              Dashboard
+              <% if (pendingBookingsCount > 0) { %>
+                <span class="position-absolute top-25 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+                  <%= pendingBookingsCount %>
+                  <span class="visually-hidden">pending bookings</span>
+                </span>
+              <% } %>
+            </a>
+          <% } %>
           <a href="/my-bookings" class="nav-link nav-link-custom">My Bookings</a>
           <form action="/logout" method="POST" class="m-0 p-0">
             <button type="submit" class="btn btn-nav-outline">

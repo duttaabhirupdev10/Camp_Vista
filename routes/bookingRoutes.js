@@ -5,6 +5,7 @@ const isLoggedIn = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/my-bookings', isLoggedIn, bookingController.myBookings);
-router.post('/campgrounds/:id/book', isLoggedIn, bookingController.createBooking);
+router.post('/campgrounds/:id/book', isLoggedIn, bookingController.showPaymentPage);
+router.post('/campgrounds/:id/confirm-payment', isLoggedIn, bookingController.confirmPayment);
 
 module.exports = router;

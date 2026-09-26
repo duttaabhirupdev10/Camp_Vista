@@ -22,6 +22,16 @@
                                     <%= booking.campgrounds ? booking.campgrounds.location : 'Unknown' %>
                                 </p>
                                 
+                                <div class="mb-3">
+                                    <% if (booking.status === 'pending') { %>
+                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill w-100">Pending Approval</span>
+                                    <% } else if (booking.status === 'paid') { %>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill w-100">Confirmed (Paid)</span>
+                                    <% } else if (booking.status === 'cancelled') { %>
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill w-100">Rejected / Cancelled</span>
+                                    <% } %>
+                                </div>
+                                
                                 <div class="bg-light rounded p-3 mb-3 flex-grow-1">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted small fw-semibold">Check-in</span>
