@@ -1,6 +1,6 @@
 # 🏕️ CampVista
 
-![CampVista Banner](https://images.unsplash.com/photo-1504280390467-3335db0dc047?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
+![CampVista Banner](https://github.com/duttaabhirupdev10/Camp_Vista/blob/main/public/images/banner.png?raw=true)
 
 **Live Demo:** [https://camp-vista.onrender.com/](https://camp-vista.onrender.com/)
 
@@ -38,21 +38,21 @@ The architecture follows a modern, stateless backend pattern with managed extern
 
 ```mermaid
 flowchart TD
-    subgraph Frontend
+    subgraph Frontend [Frontend]
         Client[Client / Web Browser]
     end
 
-    subgraph External APIs
+    subgraph ExternalAPIs [External APIs]
         Clerk[Clerk Authentication]
         OSM[OpenStreetMap / Leaflet]
         Google[Google Maps Directions]
     end
 
-    subgraph Cloud Infrastructure (Render)
+    subgraph CloudInfrastructure [Cloud Infrastructure - Render]
         NodeApp[Node.js + Express Server]
     end
 
-    subgraph Data & Storage (Neon)
+    subgraph DataStorage [Data & Storage - Neon]
         Postgres[(Neon PostgreSQL)]
         S3Bucket[(Neon S3 Storage)]
     end
