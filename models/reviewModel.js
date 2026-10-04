@@ -1,30 +1,48 @@
-const supabase = require('../utils/supabase');
+const prisma = require('../utils/prisma');
 
 const reviewModel = {
-    create(review) {
-        return supabase.from('reviews').insert(review).select().single();
+    async create(review) {
+        try {
+            const data = await prisma.reviews.create({ data: review });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    deleteById(id) {
-        return supabase.from('reviews').delete().eq('id', id);
+    async deleteById(id) {
+        try {
+            const data = await prisma.reviews.delete({ where: { id } });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findByCampgroundId(campgroundId) {
-        // We fetch the reviews and also the user's email to display as the author
-        return supabase
-            .from('reviews')
-            .select(`
-                *,
-                users (
-                    email
-                )
-            `)
-            .eq('campground_id', campgroundId)
-            .order('created_at', { ascending: false });
+    async findByCampgroundId(campgroundId) {
+        try {
+            const data = await prisma.reviews.findMany({
+                where: { campground_id: campgroundId },
+                include: {
+                    users: { select: { email: true } }
+                },
+                orderBy: { created_at: 'desc' }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findById(id) {
-        return supabase.from('reviews').select('*').eq('id', id).single();
+    async findById(id) {
+        try {
+            const data = await prisma.reviews.findUnique({
+                where: { id }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     }
 };
 

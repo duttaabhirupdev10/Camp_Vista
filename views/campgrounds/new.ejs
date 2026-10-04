@@ -2,14 +2,18 @@
 <div class="row">
     <h1 class="text-center">New Campground</h1>
     <div class="col-md-6 offset-md-3">
-        <form action="/campgrounds" method="POST">
+        <form action="/campgrounds" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="campground[title]" required>
             </div>
             <div class="mb-3">
-                <label for="image" class="form-label">Image URL</label>
-                <input type="text" class="form-control" id="image" name="campground[image]" required>
+                <label for="image" class="form-label">Upload Image</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+            </div>
+            <div class="mb-3">
+                <label for="qr_code" class="form-label">Upload Payment QR Code</label>
+                <input type="file" class="form-control" id="qr_code" name="qr_code" accept="image/*" required>
             </div>
             <div class="mb-3">
                 <label for="price" class="form-label">Price</label>
@@ -20,7 +24,13 @@
             </div>
             <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
-                <input type="text" class="form-control" id="location" name="campground[location]" required>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="location" name="campground[location]" required>
+                    <button class="btn btn-outline-secondary" type="button" id="locateBtn" title="Use current location">
+                        <i class="bi bi-geo-alt"></i>
+                    </button>
+                </div>
+                <div id="locateHelp" class="form-text d-none text-success">Location found!</div>
             </div>
             <div class="mb-3">
                 <label for="description" class="form-label">Description</label>
@@ -31,3 +41,64 @@
         <a href="/campgrounds" class="btn btn-secondary mt-3">Back to Campgrounds</a>
     </div>
 </div>
+
+<script>
+document.getElementById('locateBtn').addEventListener('click', () => {
+    const locateBtn = document.getElementById('locateBtn');
+    const locationInput = document.getElementById('location');
+    const locateHelp = document.getElementById('locateHelp');
+    
+    if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser");
+        return;
+    }
+
+    // Indicate loading state
+    locateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    locateBtn.disabled = true;
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            // Use Nominatim API for reverse geocoding
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Reset button
+                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
+                    locateBtn.disabled = false;
+                    
+                    if (data && data.display_name) {
+                        // Extracting city, state, country or using display_name directly
+                        // For simplicity, we'll use a shortened version if available, else display_name
+                        const address = data.address;
+                        const city = address.city || address.town || address.village || address.county;
+                        const state = address.state;
+                        const country = address.country;
+                        
+                        if (city && state && country) {
+                            locationInput.value = `${city}, ${state}, ${country}`;
+                        } else {
+                            locationInput.value = data.display_name;
+                        }
+                        
+                        locateHelp.classList.remove('d-none');
+                        setTimeout(() => locateHelp.classList.add('d-none'), 5000);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
+                    locateBtn.disabled = false;
+                    alert("Unable to fetch location details.");
+                });
+        },
+        (error) => {
+            console.error(error);
+            locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
+            locateBtn.disabled = false;
+            alert("Unable to retrieve your location.");
+        }
+    );
+});
+</script>

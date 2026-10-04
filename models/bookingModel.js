@@ -1,68 +1,90 @@
-const supabase = require('../utils/supabase');
+const prisma = require('../utils/prisma');
 
 const bookingModel = {
-    create(booking) {
-        return supabase.from('bookings').insert(booking).select().single();
+    async create(booking) {
+        try {
+            // Prisma expects Dates for check_in and check_out if they are DateTime
+            // But if they are string in schema? In schema.prisma we didn't see check_in/check_out!
+            // Wait, let's check schema.prisma
+            const data = await prisma.bookings.create({ data: booking });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findByUserId(userId) {
-        return supabase
-            .from('bookings')
-            .select(`
-                *,
-                campgrounds (
-                    title,
-                    image,
-                    location,
-                    price
-                )
-            `)
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false });
+    async findByUserId(userId) {
+        try {
+            const data = await prisma.bookings.findMany({
+                where: { user_id: userId },
+                include: {
+                    campgrounds: {
+                        select: { title: true, image: true, location: true, price: true }
+                    }
+                },
+                orderBy: { created_at: 'desc' }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findByCampgroundId(campgroundId) {
-        return supabase.from('bookings').select('*').eq('campground_id', campgroundId);
+    async findByCampgroundId(campgroundId) {
+        try {
+            const data = await prisma.bookings.findMany({
+                where: { campground_id: campgroundId }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findById(id) {
-        return supabase.from('bookings').select('*, campgrounds(title, owner)').eq('id', id).single();
+    async findById(id) {
+        try {
+            const data = await prisma.bookings.findUnique({
+                where: { id },
+                include: {
+                    campgrounds: {
+                        select: { title: true, owner: true }
+                    }
+                }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
     async findBookingsByOwnerId(ownerId) {
-        const { data: bookings, error } = await supabase
-            .from('bookings')
-            .select(`
-                *,
-                campgrounds!inner(title, owner)
-            `)
-            .eq('campgrounds.owner', ownerId)
-            .order('created_at', { ascending: false });
-
-        if (error || !bookings) return { data: bookings, error };
-
-        // Fetch emails for all users who made these bookings
-        const userIds = [...new Set(bookings.map(b => b.user_id))];
-        if (userIds.length > 0) {
-            const { data: usersData } = await supabase
-                .from('users')
-                .select('id, email')
-                .in('id', userIds);
-            
-            if (usersData) {
-                // Map emails to bookings
-                bookings.forEach(booking => {
-                    const user = usersData.find(u => u.id === booking.user_id);
-                    if (user) booking.users = { email: user.email };
-                });
-            }
+        try {
+            const data = await prisma.bookings.findMany({
+                where: {
+                    campgrounds: { owner: ownerId }
+                },
+                include: {
+                    campgrounds: { select: { title: true, owner: true } },
+                    users: { select: { email: true } }
+                },
+                orderBy: { created_at: 'desc' }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
         }
-        
-        return { data: bookings, error: null };
     },
 
-    updateStatus(id, status) {
-        return supabase.from('bookings').update({ status }).eq('id', id).select().single();
+    async updateStatus(id, status) {
+        try {
+            const data = await prisma.bookings.update({
+                where: { id },
+                data: { status }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     }
 };
 

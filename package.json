@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node seeds/index.js",
     "dev": "nodemon app.js",
     "start": "node app.js"
   },
@@ -14,6 +13,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@prisma/client": "^5.22.0",
     "@supabase/supabase-js": "^2.116.0",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
@@ -21,9 +23,10 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "method-override": "^3.0.0",
-    "mongoose": "^9.9.2",
     "morgan": "^1.12.0",
-    "nodemailer": "^10.0.10",
-    "passport-local-mongoose": "^9.1.0"
+    "multer": "^2.4.0",
+    "prisma": "^5.22.0",
+    "resend": "^6.32.0",
+    "winston": "^3.19.0"
   }
 }

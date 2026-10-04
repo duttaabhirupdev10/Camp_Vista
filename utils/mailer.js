@@ -1,43 +1,28 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-let transporter;
-
-// Create a test ethereal account dynamically for testing.
-// In production, you would replace this with SendGrid, Gmail, etc.
-nodemailer.createTestAccount((err, account) => {
-    if (err) {
-        console.error('Failed to create a testing account. ' + err.message);
-        return;
-    }
-    transporter = nodemailer.createTransport({
-        host: account.smtp.host,
-        port: account.smtp.port,
-        secure: account.smtp.secure,
-        auth: {
-            user: account.user,
-            pass: account.pass
-        }
-    });
-});
+// Initialize Resend with the API key from .env
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 module.exports.sendMail = async (to, subject, text) => {
     try {
-        if (!transporter) {
-            console.log('Mailer not ready yet');
+        if (!process.env.RESEND_API_KEY) {
+            console.log('⚠️ RESEND_API_KEY is not set in .env. Email skipped.');
             return;
         }
-        const info = await transporter.sendMail({
-            from: '"CampVista System" <noreply@campvista.com>',
-            to,
-            subject,
-            text
+
+        const data = await resend.emails.send({
+            from: 'CampVista System <onboarding@resend.dev>', // Update this to a verified domain when you have one
+            to: to,
+            subject: subject,
+            text: text
         });
+
         console.log('----------------------------------------------------');
-        console.log(`✉️ EMAIL SENT TO: ${to}`);
+        console.log(`✉️ EMAIL SENT VIA RESEND TO: ${to}`);
         console.log(`✉️ SUBJECT: ${subject}`);
-        console.log(`🔗 PREVIEW URL: ${nodemailer.getTestMessageUrl(info)}`);
+        console.log(`✅ MESSAGE ID: ${data.id}`);
         console.log('----------------------------------------------------');
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending email via Resend:', error);
     }
 };

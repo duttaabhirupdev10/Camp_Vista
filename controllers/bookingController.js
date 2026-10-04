@@ -26,15 +26,15 @@ const bookingController = {
     async confirmPayment(req, res) {
         try {
             const campgroundId = req.params.id;
-            const userId = req.session.user.id;
+            const userId = res.locals.currentUser.id;
             const { check_in, check_out, total_price } = req.body;
 
             const booking = {
                 campground_id: campgroundId,
                 user_id: userId,
-                check_in,
-                check_out,
-                total_price,
+                check_in: new Date(check_in),
+                check_out: new Date(check_out),
+                total_price: parseFloat(total_price),
                 status: 'pending'
             };
 
@@ -51,11 +51,11 @@ const bookingController = {
 
     async myBookings(req, res) {
         try {
-            if (!req.session.user) {
+            if (!res.locals.currentUser) {
                 return res.redirect('/login');
             }
 
-            const { data: bookings, error } = await bookingModel.findByUserId(req.session.user.id);
+            const { data: bookings, error } = await bookingModel.findByUserId(res.locals.currentUser.id);
             if (error) throw error;
 
             res.render('bookings/index', { bookings });

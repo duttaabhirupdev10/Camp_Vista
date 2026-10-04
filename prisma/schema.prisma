@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id          String        @id @default(uuid())
+  email       String        @unique
+  role        String        @default("user")
+  campgrounds campgrounds[]
+  bookings    bookings[]
+  reviews     reviews[]
+}
+
+model campgrounds {
+  id          String     @id @default(uuid())
+  title       String
+  location    String
+  price       Float
+  image       String?
+  qr_code     String?
+  description String?
+  owner       String
+  users       users      @relation(fields: [owner], references: [id])
+  bookings    bookings[]
+  reviews     reviews[]
+}
+
+model bookings {
+  id            String      @id @default(uuid())
+  user_id       String
+  campground_id String
+  status        String      @default("pending")
+  check_in      DateTime?
+  check_out     DateTime?
+  total_price   Float?
+  created_at    DateTime    @default(now())
+  users         users       @relation(fields: [user_id], references: [id])
+  campgrounds   campgrounds @relation(fields: [campground_id], references: [id])
+}
+
+model reviews {
+  id            String      @id @default(uuid())
+  body          String
+  rating        Int
+  user_id       String
+  campground_id String
+  users         users       @relation(fields: [user_id], references: [id])
+  campgrounds   campgrounds @relation(fields: [campground_id], references: [id])
+}

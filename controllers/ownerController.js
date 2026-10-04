@@ -4,11 +4,11 @@ const mailer = require('../utils/mailer');
 const ownerController = {
     async manageBookings(req, res) {
         try {
-            if (!req.session.user || (req.session.user.role !== 'owner' && req.session.user.role !== 'admin')) {
+            if (!res.locals.currentUser || (res.locals.currentUser.role !== 'owner' && res.locals.currentUser.role !== 'admin')) {
                 return res.redirect('/campgrounds');
             }
 
-            const { data: bookings, error } = await bookingModel.findBookingsByOwnerId(req.session.user.id);
+            const { data: bookings, error } = await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
             if (error) throw error;
 
             res.render('owner/manage-bookings', { bookings });

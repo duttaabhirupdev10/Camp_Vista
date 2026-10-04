@@ -15,4 +15,17 @@ router.post('/forgot-password', authController.processForgotPassword);
 router.get('/reset-password', authController.showResetPassword);
 router.post('/reset-password', authController.processResetPassword);
 
+// Allow users to upgrade their account to an owner
+router.post('/upgrade-role', async (req, res) => {
+    if (!req.auth || !req.auth.userId) return res.redirect('/login');
+    const userModel = require('../models/userModel');
+    const result = await userModel.updateRole(req.auth.userId, 'owner');
+    if (result.error) {
+        console.error("Failed to upgrade role:", result.error);
+    } else {
+        console.log("Successfully upgraded role for:", req.auth.userId);
+    }
+    res.redirect('/');
+});
+
 module.exports = router;

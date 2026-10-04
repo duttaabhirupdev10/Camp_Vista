@@ -10,9 +10,13 @@
                     <h5 class="text-secondary mb-1">Total Amount Due</h5>
                     <h2 class="display-5 fw-bold text-success mb-3">₹<%= total_price %></h2>
                     
-                    <!-- Dummy QR Code -->
+                    <!-- Owner's QR Code -->
                     <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=campvista@upi&pn=CampVista&am=<%= total_price %>&cu=INR" alt="UPI QR Code" class="img-fluid">
+                        <% if (campground.qr_code) { %>
+                            <img src="<%= campground.qr_code %>" alt="Owner's Payment QR Code" class="img-fluid" style="max-width: 200px;">
+                        <% } else { %>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=campvista@upi&pn=CampVista&am=<%= total_price %>&cu=INR" alt="UPI QR Code" class="img-fluid">
+                        <% } %>
                     </div>
                     <p class="small text-muted mt-3">Scan this QR code with any UPI app (GPay, PhonePe, Paytm) to pay.</p>
                 </div>

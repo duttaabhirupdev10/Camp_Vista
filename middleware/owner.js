@@ -4,12 +4,12 @@ module.exports.isOwner = async (req, res, next) => {
     const { id } = req.params;
     
     // User must be logged in
-    if (!req.session || !req.session.user) {
-        return res.redirect('/login');
+    if (!res.locals.currentUser) {
+        return res.redirect('/');
     }
 
     // Admins have access to everything
-    if (req.session.user.role === 'admin') {
+    if (res.locals.currentUser.role === 'admin') {
         return next();
     }
 
@@ -19,7 +19,7 @@ module.exports.isOwner = async (req, res, next) => {
         return res.status(404).send('Campground Not Found');
     }
 
-    if (campground.owner !== req.session.user.id) {
+    if (campground.owner !== res.locals.currentUser.id) {
         return res.status(403).send('Access Denied: You are not the owner of this room.');
     }
 

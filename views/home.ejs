@@ -155,9 +155,13 @@
                 <a href="/campgrounds" class="btn btn-custom btn-primary-custom text-decoration-none">Explore North Bengal</a>
                 
                 <% if(currentUser) { %>
-                    <form action="/logout" method="POST" class="d-inline">
-                        <button class="btn btn-custom btn-outline-custom">Logout</button>
-                    </form>
+                    <% if(currentUser.role === 'customer') { %>
+                        <form action="/upgrade-role" method="POST" class="d-inline">
+                            <button class="btn btn-custom btn-outline-custom text-decoration-none">Become a Camp Owner</button>
+                        </form>
+                    <% } else { %>
+                        <a href="/campgrounds/new" class="btn btn-custom btn-outline-custom text-decoration-none">Host a Camp</a>
+                    <% } %>
                 <% } else { %>
                     <a href="/login" class="btn btn-custom btn-outline-custom text-decoration-none">Login</a>
                     <a href="/register" class="btn btn-custom btn-outline-custom text-decoration-none">Register</a>

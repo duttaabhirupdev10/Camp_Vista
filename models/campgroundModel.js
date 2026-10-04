@@ -1,38 +1,74 @@
-const supabase = require('../utils/supabase');
+const prisma = require('../utils/prisma');
 
 const campgroundModel = {
-    findAll(filters = {}) {
-        let query = supabase.from('campgrounds').select('*');
-
+    async findAll(filters = {}) {
+        let where = {};
         if (filters.search) {
-            query = query.or(`title.ilike.%${filters.search}%,location.ilike.%${filters.search}%`);
+            where.OR = [
+                { title: { contains: filters.search, mode: 'insensitive' } },
+                { location: { contains: filters.search, mode: 'insensitive' } }
+            ];
         }
-        
         if (filters.maxPrice) {
-            query = query.lte('price', filters.maxPrice);
+            where.price = { lte: parseFloat(filters.maxPrice) };
         }
-
-        return query;
+        try {
+            const data = await prisma.campgrounds.findMany({ where });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findById(id) {
-        return supabase.from('campgrounds').select('*').eq('id', id).single();
+    async findById(id) {
+        try {
+            const data = await prisma.campgrounds.findUnique({ where: { id } });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    findOwnerById(id) {
-        return supabase.from('campgrounds').select('owner').eq('id', id).single();
+    async findOwnerById(id) {
+        try {
+            const data = await prisma.campgrounds.findUnique({
+                where: { id },
+                select: { owner: true }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    create(attributes) {
-        return supabase.from('campgrounds').insert(attributes).select().single();
+    async create(attributes) {
+        try {
+            const data = await prisma.campgrounds.create({ data: attributes });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    updateById(id, attributes) {
-        return supabase.from('campgrounds').update(attributes).eq('id', id).select().single();
+    async updateById(id, attributes) {
+        try {
+            const data = await prisma.campgrounds.update({
+                where: { id },
+                data: attributes
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     },
 
-    deleteById(id) {
-        return supabase.from('campgrounds').delete().eq('id', id);
+    async deleteById(id) {
+        try {
+            const data = await prisma.campgrounds.delete({ where: { id } });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
     }
 };
 
