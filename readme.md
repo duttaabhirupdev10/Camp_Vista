@@ -10,25 +10,25 @@ CampVista is a modern, full-stack campground booking and review platform. It con
 
 ## 🚀 Features
 
-* **User Authentication:** Secure signup and login powered by Clerk.
-* **Role-Based Access Control:** Distinct roles for Customers, Campground Owners, and Admins.
-* **Interactive Maps:** View campgrounds on a map, get distances from your current location, and instantly launch Google Maps directions.
-* **Booking Engine:** Select check-in/check-out dates, calculate dynamic pricing, and manage booking statuses.
-* **QR Code Payments:** Owners can upload their personal UPI/Payment QR codes for customers to scan and pay directly.
-* **Reviews & Ratings:** Users can leave authentic reviews and ratings for campgrounds they've visited.
-* **Cloud Storage:** High-performance, S3-compatible cloud storage for campground images and QR codes.
+- **User Authentication:** Secure signup and login powered by Clerk.
+- **Role-Based Access Control:** Distinct roles for Customers, Campground Owners, and Admins.
+- **Interactive Maps:** View campgrounds on a map, get distances from your current location, and instantly launch Google Maps directions.
+- **Booking Engine:** Select check-in/check-out dates, calculate dynamic pricing, and manage booking statuses.
+- **QR Code Payments:** Owners can upload their personal UPI/Payment QR codes for customers to scan and pay directly.
+- **Reviews & Ratings:** Users can leave authentic reviews and ratings for campgrounds they've visited.
+- **Cloud Storage:** High-performance, S3-compatible cloud storage for campground images and QR codes.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** HTML, CSS, JavaScript, EJS (Embedded JavaScript templates), Bootstrap 5, Leaflet.js
-* **Backend:** Node.js, Express.js
-* **Database:** Neon Serverless PostgreSQL
-* **ORM:** Prisma
-* **Authentication:** Clerk
-* **Storage:** Neon Object Storage (S3-Compatible)
-* **Hosting:** Render (Web Service)
+- **Frontend:** HTML, CSS, JavaScript, EJS (Embedded JavaScript templates), Bootstrap 5, Leaflet.js
+- **Backend:** Node.js, Express.js
+- **Database:** Neon Serverless PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** Clerk
+- **Storage:** Neon Object Storage (S3-Compatible)
+- **Hosting:** Render (Web Service)
 
 ---
 
@@ -69,9 +69,10 @@ flowchart TD
 ```
 
 ### Components:
+
 1. **Client Browser:** Renders EJS views, handles user geolocation, and interfaces directly with Clerk for auth states.
 2. **Node.js/Express Server (Render):** The core routing logic. It is entirely stateless, relying on external services for persistence.
-3. **Clerk:** Manages users, sessions, and passwords securely. 
+3. **Clerk:** Manages users, sessions, and passwords securely.
 4. **Neon PostgreSQL:** The primary relational database containing `users`, `campgrounds`, `bookings`, and `reviews`.
 5. **Neon S3 Storage:** A robust object storage bucket holding all user-uploaded images and QR codes.
 
@@ -82,18 +83,22 @@ flowchart TD
 To run CampVista locally, follow these steps:
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/yourusername/CampVista.git
 cd CampVista
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Configure Environment Variables
+
 Create a `.env` file in the root directory and add your secret keys:
+
 ```env
 # Database
 DATABASE_URL="postgres://[user]:[password]@[neon-host]/neondb"
@@ -110,19 +115,24 @@ AWS_REGION="us-east-2"
 ```
 
 ### 4. Sync Database Schema
+
 Generate the Prisma client and push the schema to your Neon database:
+
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
 ### 5. Start the Server
+
 ```bash
 npm run dev
 ```
+
 Your application will be running at `http://localhost:3000`.
 
 ---
 
 ## 📄 License
+
 This project is licensed under the MIT License.
