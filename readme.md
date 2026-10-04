@@ -1,6 +1,6 @@
 # 🏕️ CampVista
 
-![CampVista Banner](https://github.com/duttaabhirupdev10/Camp_Vista/blob/main/public/images/banner.png?raw=true)
+![CampVista Banner](https://github.com/user-attachments/assets/6925c67e-6ae6-4a5f-abbd-2b9c56b57210)
 
 **Live Demo:** [https://camp-vista.onrender.com/](https://camp-vista.onrender.com/)
 
