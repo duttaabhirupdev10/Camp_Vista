@@ -1,6 +1,6 @@
 # 🏕️ CampVista
 
-![CampVista Banner](https://images.unsplash.com/photo-1504280390467-3335db0dc047?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80)
+![CampVista Banner](<img width="1983" height="793" alt="Image" src="https://github.com/user-attachments/assets/6925c67e-6ae6-4a5f-abbd-2b9c56b57210" />)
 
 **Live Demo:** [https://camp-vista.onrender.com/](https://camp-vista.onrender.com/)
 
