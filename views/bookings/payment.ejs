@@ -1,37 +1,64 @@
 <% layout('layouts/boilerplate') %>
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-body p-4 text-center">
-                <h3 class="fw-bold mb-3">Complete Your Payment</h3>
-                <p class="text-muted mb-4">You are booking <strong><%= campground.title %></strong><br>From <%= check_in %> to <%= check_out %></p>
-                
-                <div class="bg-light rounded-3 p-4 mb-4">
-                    <h5 class="text-secondary mb-1">Total Amount Due</h5>
-                    <h2 class="display-5 fw-bold text-success mb-3">₹<%= total_price %></h2>
-                    
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <!-- Stepper Breadcrumb -->
+            <div class="d-flex justify-content-center align-items-center gap-3 mb-4 text-muted small">
+                <span>1. Dates</span>
+                <i class="bi bi-chevron-right"></i>
+                <span class="fw-bold text-success">2. UPI Payment</span>
+                <i class="bi bi-chevron-right"></i>
+                <span>3. Confirmed</span>
+            </div>
+
+            <div class="form-card text-center">
+                <span class="eyebrow justify-content-center mb-2">
+                    <span></span> SECURE CHECKOUT
+                </span>
+                <h2 class="mb-2" style="font-family: var(--serif); font-size: 32px;">Complete Payment</h2>
+                <p class="text-muted small mb-4">
+                    Reserving <strong><%= campground.title %></strong><br>
+                    <%= check_in %> &rarr; <%= check_out %>
+                </p>
+
+                <!-- Amount Box -->
+                <div class="p-4 rounded-3 mb-4" style="background-color: var(--cream); border: 1px solid var(--sand);">
+                    <span class="text-muted text-uppercase fw-bold small d-block mb-1" style="letter-spacing: 1px; font-size: 10px;">Total Amount Due</span>
+                    <h1 class="display-6 fw-bold mb-3" style="color: var(--forest);">₹<%= Number(total_price).toLocaleString('en-IN') %></h1>
+
                     <!-- Owner's QR Code -->
-                    <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm">
+                    <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-2 border">
                         <% if (campground.qr_code) { %>
-                            <img src="<%= campground.qr_code %>" alt="Owner's Payment QR Code" class="img-fluid" style="max-width: 200px;">
+                            <img src="<%= campground.qr_code %>" alt="Owner UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
                         <% } else { %>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=campvista@upi&pn=CampVista&am=<%= total_price %>&cu=INR" alt="UPI QR Code" class="img-fluid">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=campvista@upi&pn=CampVista&am=<%= total_price %>&cu=INR" alt="UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px;">
                         <% } %>
                     </div>
-                    <p class="small text-muted mt-3">Scan this QR code with any UPI app (GPay, PhonePe, Paytm) to pay.</p>
+                    
+                    <p class="small text-muted mb-2">Scan with Google Pay, PhonePe, Paytm or any UPI app to pay.</p>
+                    
+                    <!-- Copy UPI ID Helper Button -->
+                    <button type="button" class="btn btn-outline btn-sm py-1 px-3 mt-1" id="copyUpiBtn" onclick="navigator.clipboard.writeText('campvista@upi'); this.innerText = 'Copied!'; setTimeout(() => this.innerText = 'Copy UPI ID: campvista@upi', 2000);">
+                        <i class="bi bi-clipboard me-1"></i> Copy UPI ID: campvista@upi
+                    </button>
                 </div>
 
+                <!-- Confirmation Form -->
                 <form action="/campgrounds/<%= campground.id %>/confirm-payment" method="POST">
                     <input type="hidden" name="check_in" value="<%= check_in %>">
                     <input type="hidden" name="check_out" value="<%= check_out %>">
                     <input type="hidden" name="total_price" value="<%= total_price %>">
-                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">I Have Completed the Payment</button>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i> I Have Completed the Payment
+                    </button>
                 </form>
-                
-                <div class="mt-3">
-                    <a href="/campgrounds/<%= campground.id %>" class="btn btn-link text-decoration-none text-secondary">Cancel Booking</a>
-                </div>
+
+                <a href="/campgrounds/<%= campground.id %>" class="text-secondary small text-decoration-none">
+                    Cancel &amp; return to camp details
+                </a>
             </div>
         </div>
     </div>
-</div>
+</main>

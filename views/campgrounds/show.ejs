@@ -1,159 +1,335 @@
 <% layout('layouts/boilerplate') %>
+
 <!-- Leaflet CSS for the map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-<div class="row justify-content-center">
-    <div class="col-xl-10">
-        <div class="row g-0 overflow-hidden border rounded-3 shadow-sm bg-white">
-            <div class="col-lg-7">
-                <img src="<%= campground.image %>" class="w-100 h-100 object-fit-cover" style="min-height: 420px;" alt="<%= campground.title %>">
+<main class="detail-page container">
+    <!-- Back Button -->
+    <a href="/campgrounds" class="back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Back to all camps
+    </a>
+
+    <!-- Photo Gallery Grid -->
+    <div class="gallery">
+        <img class="gallery-main" src="<%= campground.image || 'https://images.unsplash.com/photo-1715092387304-ef4d5f41ffdb?auto=format&fit=crop&w=1200&q=85' %>" alt="<%= campground.title %>">
+        <img src="https://images.unsplash.com/photo-1579063890939-deb71d85a91a?auto=format&fit=crop&w=800&q=85" alt="Scenic mountain view">
+        <img src="https://images.unsplash.com/photo-1618772446265-3f9f8e6f8487?auto=format&fit=crop&w=800&q=85" alt="Tents in nature">
+        <button class="view-photos-btn" type="button" onclick="alert('Viewing full gallery for <%= campground.title %>');">
+            View all photos
+        </button>
+    </div>
+
+    <!-- Detail Heading -->
+    <div class="detail-heading">
+        <div>
+            <span>NATURE RETREAT &middot; <%= campground.location ? campground.location.toUpperCase() : 'NORTH BENGAL' %></span>
+            <h1><%= campground.title %></h1>
+            <p>
+                <span class="rating">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d">
+                        <path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" />
+                    </svg>
+                    4.9
+                </span>
+                &middot; <%= (campground.reviews && campground.reviews.length) || 0 %> reviews &middot;
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-danger">
+                    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                </svg>
+                <%= campground.location %>
+                <span id="distanceBadge" class="badge bg-success ms-2 d-none">Calculating distance...</span>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=<%= encodeURIComponent(campground.location) %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline ms-2">
+                    <i class="bi bi-sign-turn-right-fill me-1"></i> Directions
+                </a>
+            </p>
+        </div>
+
+        <!-- Edit/Delete for Owner or Admin -->
+        <% if (currentUser && (currentUser.role === 'admin' || campground.owner === currentUser.id)) { %>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/campgrounds/<%= campground.id || campground._id %>/edit" class="btn btn-outline btn-sm">Edit camp</a>
+                <form action="/campgrounds/<%= campground.id || campground._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this campground?');">
+                    <button type="submit" class="btn btn-ghost btn-sm text-danger">Delete</button>
+                </form>
             </div>
-            <div class="col-lg-5 p-4 p-lg-5 d-flex flex-column">
-                <p class="text-uppercase text-secondary small fw-semibold mb-2">CampVista campground</p>
-                <h1 class="display-6 fw-bold mb-2"><%= campground.title %></h1>
-                <p class="text-secondary mb-4">
-                    <i class="bi bi-geo-alt-fill text-danger me-1"></i><%= campground.location %> 
-                    <span id="distanceBadge" class="badge bg-info text-dark ms-2 d-none">Calculating distance...</span>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=<%= encodeURIComponent(campground.location) %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary ms-2 rounded-pill">
-                        <i class="bi bi-sign-turn-right-fill me-1"></i> Directions
-                    </a>
+        <% } %>
+    </div>
+
+    <!-- 2-Column Detail Layout -->
+    <div class="detail-layout">
+        <!-- Left Column: Story, Amenities, Host, Map, Reviews -->
+        <div class="detail-copy">
+            <!-- The Experience Section -->
+            <section>
+                <span class="eyebrow">
+                    <span></span> The experience
+                </span>
+                <h2>Sleep beneath the tranquil canopy of North Bengal.</h2>
+                <p>
+                    <%= campground.description || "Set on the peaceful wilderness of North Bengal, this camp is a grounded sanctuary for travellers drawn to the authentic rhythms of the outdoors. Wake to birdsong, explore forest and tea trails, and gather around a campfire as dusk settles." %>
                 </p>
+            </section>
 
-                <div class="border-top border-bottom py-3 mb-4">
-                    <span class="text-secondary small d-block">Price per night</span>
-                    <span class="fs-3 fw-semibold">₹<%= campground.price %></span>
+            <!-- Amenities Section -->
+            <section>
+                <h2>What this place offers</h2>
+                <div class="amenities">
+                    <div>
+                        <i class="bi bi-fire fs-5 text-warning"></i>
+                        <span>Campfire pit & firewood</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-shield-check fs-5 text-success"></i>
+                        <span>Private clean bathroom</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-compass fs-5 text-primary"></i>
+                        <span>Guided forest & river walks</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-cup-hot fs-5 text-danger"></i>
+                        <span>Meals & local organic tea</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-tree fs-5 text-success"></i>
+                        <span>Direct forest & river access</span>
+                    </div>
+                    <div>
+                        <i class="bi bi-p-circle fs-5 text-info"></i>
+                        <span>Free vehicle parking</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Host Section -->
+            <section class="host">
+                <div class="avatar large">CV</div>
+                <div>
+                    <small>Hosted by</small>
+                    <h3>CampVista Verified Host</h3>
+                    <p>Superhost &middot; Dedicated wilderness manager</p>
+                </div>
+                <a href="mailto:support@campvista.com" class="btn btn-outline btn-sm">Contact host</a>
+            </section>
+
+            <!-- Map Section -->
+            <section>
+                <h2>Location & Surroundings</h2>
+                <p class="text-secondary small mb-3">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i><%= campground.location %>
+                </p>
+                <div id="campgroundMap"></div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="m-0">Guest Reviews</h2>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                        ★ 4.9 (<%= (campground.reviews && campground.reviews.length) || 0 %> verified reviews)
+                    </span>
                 </div>
 
-                <p class="lh-lg flex-grow-1 mb-4"><%= campground.description %></p>
+                <% 
+                    let hasReviewed = false;
+                    if (currentUser && campground.reviews) {
+                        hasReviewed = campground.reviews.some(r => r.author_id === currentUser.id);
+                    }
+                %>
 
-                <% if (currentUser && (currentUser.role === 'admin' || campground.owner === currentUser.id)) { %>
-                <div class="d-flex flex-wrap gap-2 mb-4">
-                    <a href="/campgrounds/<%= campground._id %>/edit" class="btn btn-dark">Edit campground</a>
-                    <form action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
-                        <button type="submit" class="btn btn-outline-danger">Delete</button>
-                    </form>
-                </div>
+                <% if (currentUser && !hasReviewed) { %>
+                    <div class="form-card mb-4 bg-light">
+                        <h4 class="fw-bold mb-3">Leave a Review</h4>
+                        <form action="/campgrounds/<%= campground.id %>/reviews" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label" for="rating">Rating</label>
+                                <select class="form-select" name="review[rating]" id="rating" required>
+                                    <option value="5">⭐⭐⭐⭐⭐ 5 - Exceptional</option>
+                                    <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+                                    <option value="3">⭐⭐⭐ 3 - Average</option>
+                                    <option value="2">⭐⭐ 2 - Poor</option>
+                                    <option value="1">⭐ 1 - Terrible</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="body">Your Experience</label>
+                                <textarea class="form-control" name="review[body]" id="body" rows="3" placeholder="Tell other travellers what was special about this campsite..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+                        </form>
+                    </div>
+                <% } else if (currentUser && hasReviewed) { %>
+                    <div class="alert alert-success border-0 rounded-3 mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> You have already shared your review for this campground. Thank you!
+                    </div>
                 <% } %>
 
-                <!-- Booking Form -->
-                <div class="card shadow-sm border-0 bg-light mt-auto">
-                    <div class="card-body p-4">
-                        <h5 class="card-title fw-bold mb-3">Book your stay</h5>
-                        <% if (currentUser) { %>
-                            <form action="/campgrounds/<%= campground.id %>/book" method="POST">
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label for="check_in" class="form-label small text-secondary fw-semibold">Check-in</label>
-                                        <input type="date" class="form-control" id="check_in" name="check_in" required>
+                <!-- Review Cards -->
+                <% if (campground.reviews && campground.reviews.length > 0) { %>
+                    <div class="row g-3">
+                        <% for (let review of campground.reviews) { %>
+                            <div class="col-md-6">
+                                <div class="p-3 border rounded-3 bg-white h-100 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="avatar" style="width: 32px; height: 32px; font-size: 10px;">
+                                                <%= (review.users && review.users.email) ? review.users.email.charAt(0).toUpperCase() : 'G' %>
+                                            </div>
+                                            <span class="fw-bold small text-truncate" style="max-width: 140px;">
+                                                <%= review.users ? review.users.email.split('@')[0] : 'Guest' %>
+                                            </span>
+                                        </div>
+                                        <span class="text-warning small fw-bold">
+                                            <% for(let s = 0; s < review.rating; s++) { %>★<% } %>
+                                        </span>
                                     </div>
-                                    <div class="col-6">
-                                        <label for="check_out" class="form-label small text-secondary fw-semibold">Check-out</label>
-                                        <input type="date" class="form-control" id="check_out" name="check_out" required>
-                                    </div>
+                                    <p class="small text-secondary mb-3 flex-grow-1"><%= review.body %></p>
+                                    <% if (currentUser && (review.author_id === currentUser.id || currentUser.role === 'admin')) { %>
+                                        <form action="/campgrounds/<%= campground.id %>/reviews/<%= review.id %>?_method=DELETE" method="POST" class="mt-auto text-end">
+                                            <button type="submit" class="border-0 bg-transparent text-danger p-0 small">Delete review</button>
+                                        </form>
+                                    <% } %>
                                 </div>
-                                <button class="btn btn-primary w-100 fw-bold py-2" type="submit">Book Now</button>
-                            </form>
-                        <% } else { %>
-                            <div class="text-center py-2">
-                                <p class="text-muted mb-2">You must be logged in to book.</p>
-                                <a href="/login" class="btn btn-outline-primary w-100">Login to Book</a>
                             </div>
                         <% } %>
                     </div>
-                </div>
-
-            </div>
+                <% } else { %>
+                    <p class="text-muted small">No reviews yet. Be the first adventurer to leave a review!</p>
+                <% } %>
+            </section>
         </div>
 
-        <!-- MAP SECTION -->
-        <div class="mt-4 border rounded-3 overflow-hidden shadow-sm">
-            <div id="campgroundMap" style="height: 350px; width: 100%;"></div>
-        </div>
-
-        <!-- REVIEWS SECTION -->
-        <div class="mt-5">
-            <h3 class="fw-bold mb-4">Reviews</h3>
-            
-            <% 
-                let hasReviewed = false;
-                if (currentUser && campground.reviews) {
-                    hasReviewed = campground.reviews.some(r => r.author_id === currentUser.id);
-                }
-            %>
-
-            <% if (currentUser && !hasReviewed) { %>
-            <div class="card shadow-sm border-0 mb-4 bg-white p-4 rounded-3">
-                <h5 class="mb-3">Leave a Review</h5>
-                <form action="/campgrounds/<%= campground.id %>/reviews" method="POST">
-                    <div class="mb-3">
-                        <label class="form-label" for="rating">Rating</label>
-                        <select class="form-select" name="review[rating]" id="rating" required>
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="3">3 - Average</option>
-                            <option value="2">2 - Poor</option>
-                            <option value="1">1 - Terrible</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="body">Review</label>
-                        <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
-                    </div>
-                    <button class="btn btn-success">Submit Review</button>
-                </form>
+        <!-- Right Column: Sticky Booking Widget -->
+        <aside class="booking-card">
+            <div class="booking-price">
+                <strong>₹<%= campground.price ? Number(campground.price).toLocaleString('en-IN') : 0 %></strong>
+                <span>/ night</span>
+                <span class="rating">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d">
+                        <path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" />
+                    </svg>
+                    4.9
+                </span>
             </div>
-            <% } else if (currentUser && hasReviewed) { %>
-                <div class="alert alert-info border-0 shadow-sm mb-4">
-                    <i class="bi bi-info-circle-fill me-2"></i> You have already reviewed this campground. Thank you for your feedback!
-                </div>
-            <% } %>
 
-            <div class="row">
-            <% if (campground.reviews && campground.reviews.length > 0) { %>
-                <% for(let review of campground.reviews) { %>
-                    <div class="col-md-6 mb-3">
-                        <div class="card shadow-sm border-0 h-100">
-                            <div class="card-body">
-                                <h6 class="card-subtitle mb-2 text-muted">
-                                    <i class="bi bi-person-circle"></i> <%= review.users ? review.users.email : 'Anonymous' %>
-                                </h6>
-                                <p class="card-text mb-2">
-                                    <span class="badge bg-primary rounded-pill"><%= review.rating %> / 5 Stars</span>
-                                </p>
-                                <p class="card-text"><%= review.body %></p>
-                                <% if (currentUser && (review.author_id === currentUser.id || currentUser.role === 'admin')) { %>
-                                    <form action="/campgrounds/<%= campground.id %>/reviews/<%= review.id %>?_method=DELETE" method="POST">
-                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-                                <% } %>
-                            </div>
+            <% if (currentUser) { %>
+                <form action="/campgrounds/<%= campground.id %>/book" method="POST" id="bookingForm">
+                    <div class="date-grid">
+                        <label>
+                            <span>CHECK-IN</span>
+                            <input type="date" id="check_in" name="check_in" required>
+                        </label>
+                        <label>
+                            <span>CHECK-OUT</span>
+                            <input type="date" id="check_out" name="check_out" required>
+                        </label>
+                        <label class="guest-field">
+                            <span>CAMPERS</span>
+                            <select aria-label="Guests">
+                                <option>2 campers</option>
+                                <option>1 camper</option>
+                                <option>3 campers</option>
+                                <option>4+ campers</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="reserveBtn">Reserve now</button>
+                    <small class="no-charge">You will review payment next</small>
+
+                    <!-- Real-Time Dynamic Price Breakdown -->
+                    <div class="price-lines" id="priceLines" style="display: none;">
+                        <div>
+                            <span id="rateCalculation">₹<%= campground.price %> &times; 1 night</span>
+                            <span id="subtotalAmount">₹<%= campground.price %></span>
+                        </div>
+                        <div>
+                            <span>Service & maintenance fee (5%)</span>
+                            <span id="serviceFeeAmount">₹0</span>
+                        </div>
+                        <div class="total">
+                            <strong>Estimated Total</strong>
+                            <strong id="totalAmount">₹<%= campground.price %></strong>
                         </div>
                     </div>
-                <% } %>
+
+                    <p class="secure">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z" />
+                            <path d="m9 12 2 2 4-4" />
+                        </svg>
+                        Secure booking &middot; Direct UPI payment
+                    </p>
+                </form>
             <% } else { %>
-                <p class="text-muted">No reviews yet. Be the first to leave one!</p>
+                <div class="text-center py-3">
+                    <p class="text-muted small mb-3">Sign in to check availability and reserve your campsite.</p>
+                    <a href="/login" class="btn btn-primary w-100">Login to Reserve</a>
+                </div>
             <% } %>
-            </div>
-        </div>
-
-        <a href="/campgrounds" class="btn btn-link px-0 mt-3 text-decoration-none">&larr; All campgrounds</a>
+        </aside>
     </div>
-</div>
+</main>
 
-<!-- Leaflet JS -->
+<!-- Leaflet JS & Dynamic Distance & Price Calculation Scripts -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+    const campPrice = <%= campground.price || 0 %>;
+    const checkInInput = document.getElementById('check_in');
+    const checkOutInput = document.getElementById('check_out');
+    const priceLines = document.getElementById('priceLines');
+    const rateCalculation = document.getElementById('rateCalculation');
+    const subtotalAmount = document.getElementById('subtotalAmount');
+    const serviceFeeAmount = document.getElementById('serviceFeeAmount');
+    const totalAmount = document.getElementById('totalAmount');
+
+    // Dynamic Live Price Calculator
+    function updatePricing() {
+        if (!checkInInput || !checkOutInput || !checkInInput.value || !checkOutInput.value) return;
+        const d1 = new Date(checkInInput.value);
+        const d2 = new Date(checkOutInput.value);
+        const diffTime = d2 - d1;
+        const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (nights > 0) {
+            priceLines.style.display = 'grid';
+            const subtotal = campPrice * nights;
+            const fee = Math.round(subtotal * 0.05);
+            const total = subtotal + fee;
+            rateCalculation.innerHTML = `₹${campPrice.toLocaleString('en-IN')} &times; ${nights} night${nights > 1 ? 's' : ''}`;
+            subtotalAmount.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+            serviceFeeAmount.textContent = `₹${fee.toLocaleString('en-IN')}`;
+            totalAmount.textContent = `₹${total.toLocaleString('en-IN')}`;
+        } else {
+            priceLines.style.display = 'none';
+        }
+    }
+
+    if (checkInInput && checkOutInput) {
+        // Set default minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        checkInInput.min = today;
+        checkOutInput.min = today;
+        checkInInput.addEventListener('change', () => {
+            checkOutInput.min = checkInInput.value;
+            updatePricing();
+        });
+        checkOutInput.addEventListener('change', updatePricing);
+    }
+
+    // Leaflet Map & Geolocation Distance
     const campgroundLocation = "<%= campground.location %>";
-    const map = L.map('campgroundMap').setView([20.5937, 78.9629], 5); // Default to center of India
+    const map = L.map('campgroundMap').setView([26.7271, 88.3953], 8); // North Bengal center default
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     const distanceBadge = document.getElementById('distanceBadge');
 
-    // 1. Geocode the campground location
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(campgroundLocation)}`)
         .then(response => response.json())
         .then(data => {
@@ -161,40 +337,28 @@
                 const campLat = parseFloat(data[0].lat);
                 const campLon = parseFloat(data[0].lon);
                 
-                // Center map and add marker
-                map.setView([campLat, campLon], 13);
+                map.setView([campLat, campLon], 12);
                 L.marker([campLat, campLon]).addTo(map)
                     .bindPopup(`<b><%= campground.title %></b><br>${campgroundLocation}`)
                     .openPopup();
 
-                // 2. Get User Location & Calculate Distance
-                if ("geolocation" in navigator) {
+                if ("geolocation" in navigator && distanceBadge) {
                     distanceBadge.classList.remove('d-none');
                     navigator.geolocation.getCurrentPosition(position => {
                         const userLat = position.coords.latitude;
                         const userLon = position.coords.longitude;
                         
-                        // Calculate distance (Leaflet built-in method)
                         const userLatLng = L.latLng(userLat, userLon);
                         const campLatLng = L.latLng(campLat, campLon);
                         const distanceInMeters = userLatLng.distanceTo(campLatLng);
                         const distanceInKm = (distanceInMeters / 1000).toFixed(1);
                         
                         distanceBadge.innerHTML = `<i class="bi bi-geo-fill"></i> ${distanceInKm} km away`;
-                        distanceBadge.classList.replace('bg-info', 'bg-success');
-                        distanceBadge.classList.replace('text-dark', 'text-white');
-                        
-                        // Optional: Add user marker to map
-                        // L.marker([userLat, userLon]).addTo(map).bindPopup("You are here");
-                    }, error => {
-                        distanceBadge.innerHTML = 'Location access denied';
-                        distanceBadge.classList.replace('bg-info', 'bg-secondary');
-                        distanceBadge.classList.replace('text-dark', 'text-white');
+                    }, () => {
+                        distanceBadge.classList.add('d-none');
                     });
                 }
-            } else {
-                console.log("Location not found on map");
             }
         })
-        .catch(error => console.error('Error fetching location:', error));
+        .catch(err => console.error("Map geocoding error:", err));
 </script>

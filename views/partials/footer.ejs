@@ -1,25 +1,58 @@
-<style>
-  .footer-glass {
-    background: rgba(15, 23, 42, 0.95);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  .footer-text {
-    color: #94a3b8;
-    font-size: 0.95rem;
-    font-weight: 300;
-  }
-  .footer-brand {
-    font-weight: 600;
-    color: #38bdf8;
-  }
-</style>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <a class="logo logo-light" href="/" aria-label="CampVista Home">
+        <span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 20 12 4l9 16M7.5 20 12 12l4.5 8M3 20h18" />
+          </svg>
+        </span>
+        CampVista
+      </a>
+      <p>
+        Your gateway to the wild. Discover remarkable camps and nature stays
+        across North Bengal and the Himalayas.
+      </p>
+      <span>Discover. Escape. Explore.</span>
+    </div>
+    
+    <div>
+      <strong>Explore</strong>
+      <a href="/campgrounds">All camps</a>
+      <a href="/campgrounds?search=Darjeeling">Darjeeling</a>
+      <a href="/campgrounds?search=Dooars">Dooars</a>
+      <a href="/campgrounds?search=Kalimpong">Kalimpong</a>
+    </div>
 
-<footer class="footer footer-glass py-4 mt-auto">
-  <div class="container text-center">
-    <span class="footer-text">
-      &copy; <%= new Date().getFullYear() %> <span class="footer-brand">CampVista</span>. All rights reserved.
-    </span>
+    <div>
+      <strong>CampVista</strong>
+      <a href="/#why-campvista">Why CampVista</a>
+      <a href="/#why-campvista">How it works</a>
+      <a href="/campgrounds">Verified stays</a>
+      <a href="/campgrounds">Safety & standards</a>
+    </div>
+
+    <div>
+      <strong>For hosts</strong>
+      <% if (currentUser && (currentUser.role === 'owner' || currentUser.role === 'admin')) { %>
+        <a href="/manage-bookings">Host dashboard</a>
+        <a href="/campgrounds/new">Add new campsite</a>
+      <% } else if (currentUser && currentUser.role === 'customer') { %>
+        <form action="/upgrade-role" method="POST" class="d-inline m-0 p-0">
+          <button type="submit" class="border-0 bg-transparent p-0 text-white-50" style="font-size: 11px;">Become a Host</button>
+        </form>
+      <% } else { %>
+        <a href="/campgrounds/new">List your camp</a>
+      <% } %>
+      <a href="/login">Host login</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>&copy; <%= new Date().getFullYear() %> CampVista. Made for the wild at heart.</span>
+    <div>
+      <a href="#">Privacy policy</a>
+      <a href="#">Terms of service</a>
+    </div>
   </div>
 </footer>

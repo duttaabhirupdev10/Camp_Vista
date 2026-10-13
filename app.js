@@ -18,7 +18,7 @@ const ownerRoutes = require("./routes/ownerRoutes");
 app.use(morgan("dev"));
 app.use(methodOverride("_method"));
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static(path.join(__dirname, "public")));
 
 // ===============================
 // EJS CONFIGURATION
@@ -79,8 +79,15 @@ app.use(async (req, res, next) => {
     next();
 });
 
-app.get("/", (req, res) => {
-    res.render("home");
+app.get("/", async (req, res) => {
+    try {
+        const campgroundService = require('./services/campgroundService');
+        const campgrounds = await campgroundService.listCampgrounds({});
+        res.render("home", { campgrounds });
+    } catch (err) {
+        logger.error(`Error loading campgrounds for home: ${err}`);
+        res.render("home", { campgrounds: [] });
+    }
 });
 
 app.use("/", authRoutes);

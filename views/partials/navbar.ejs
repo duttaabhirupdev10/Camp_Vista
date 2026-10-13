@@ -1,101 +1,79 @@
-<style>
-  .navbar-glass {
-    background: rgba(15, 23, 42, 0.8) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .navbar-brand-gradient {
-    font-weight: 800;
-    background: linear-gradient(to right, #38bdf8, #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.05em;
-    font-size: 1.5rem;
-  }
-  .nav-link-custom {
-    color: #cbd5e1 !important;
-    font-weight: 500;
-    transition: color 0.3s ease;
-  }
-  .nav-link-custom:hover {
-    color: #38bdf8 !important;
-  }
-  .btn-nav-action {
-    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .btn-nav-action:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px -5px rgba(56, 189, 248, 0.6);
-    color: white;
-  }
-  .btn-nav-outline {
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 600;
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    background: rgba(255,255,255,0.05);
-    transition: all 0.3s ease;
-  }
-  .btn-nav-outline:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-  }
-</style>
+<header class="header">
+  <div class="container nav-wrap">
+    <!-- Brand Logo with Camp Icon -->
+    <a class="logo" href="/" aria-label="CampVista Home">
+      <span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 20 12 4l9 16M7.5 20 12 12l4.5 8M3 20h18" />
+        </svg>
+      </span>
+      CampVista
+    </a>
 
-<nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-glass py-3">
-  <div class="container">
-
-    <a class="navbar-brand navbar-brand-gradient" href="/">CampVista</a>
-
-    <button class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-
-      <!-- Left side -->
-      <div class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
-        <a class="nav-link nav-link-custom mx-2" href="/">Home</a>
-        <a class="nav-link nav-link-custom mx-2" href="/campgrounds">Campgrounds</a>
-        <a class="nav-link nav-link-custom mx-2" href="/campgrounds/new">New Campground</a>
-      </div>
-
-      <!-- Right side -->
-      <div class="navbar-nav ms-auto d-flex align-items-center gap-3">
-        <% if(!currentUser) { %>
-          <a href="/login" class="nav-link nav-link-custom">Login</a>
-          <a href="/register" class="btn btn-nav-action text-decoration-none">Register</a>
-        <% } else { %>
-          <% if (currentUser.role === 'owner' || currentUser.role === 'admin') { %>
-            <a href="/manage-bookings" class="nav-link nav-link-custom position-relative me-3">
-              Dashboard
-              <% if (pendingBookingsCount > 0) { %>
-                <span class="position-absolute top-25 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
-                  <%= pendingBookingsCount %>
-                  <span class="visually-hidden">pending bookings</span>
-                </span>
-              <% } %>
-            </a>
+    <!-- Desktop Navigation Links -->
+    <nav class="desktop-nav">
+      <a href="/" class="<%= (typeof page !== 'undefined' && page === 'home') ? 'active' : '' %>">Home</a>
+      <a href="/campgrounds" class="<%= (typeof page !== 'undefined' && page === 'explore') ? 'active' : '' %>">Explore camps</a>
+      <a href="/#why-campvista">How it works</a>
+      
+      <% if (currentUser && (currentUser.role === 'owner' || currentUser.role === 'admin')) { %>
+        <a href="/manage-bookings" class="<%= (typeof page !== 'undefined' && page === 'dashboard') ? 'active' : '' %> position-relative">
+          Host dashboard
+          <% if (pendingBookingsCount > 0) { %>
+            <span class="badge rounded-pill bg-danger ms-1" style="font-size: 0.65rem;">
+              <%= pendingBookingsCount %>
+            </span>
           <% } %>
-          <a href="/my-bookings" class="nav-link nav-link-custom">My Bookings</a>
-          <div id="user-button"></div>
-        <% } %>
-      </div>
+        </a>
+      <% } else if (currentUser && currentUser.role === 'customer') { %>
+        <form action="/upgrade-role" method="POST" class="d-inline m-0 p-0">
+          <button type="submit" class="border-0 bg-transparent p-0 fw-semibold text-secondary" style="font-size: 13px;">Host a camp</button>
+        </form>
+      <% } else { %>
+        <a href="/campgrounds/new">Host a camp</a>
+      <% } %>
+    </nav>
 
+    <!-- Nav Actions / User Auth -->
+    <div class="nav-actions">
+      <% if (!currentUser) { %>
+        <a href="/login" class="btn btn-ghost">Log in</a>
+        <a href="/register" class="btn btn-primary btn-sm">Sign up</a>
+      <% } else { %>
+        <a href="/my-bookings" class="my-trips">My trips</a>
+        <div id="user-button"></div>
+      <% } %>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="menu-button" type="button" data-bs-toggle="collapse" data-bs-target="#mobileHeaderMenu" aria-controls="mobileHeaderMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </button>
     </div>
   </div>
-</nav>
+
+  <!-- Mobile Collapsible Menu -->
+  <div class="collapse d-lg-none bg-white border-bottom shadow-sm px-4 py-3" id="mobileHeaderMenu">
+    <div class="d-flex flex-column gap-2">
+      <a href="/" class="py-2 text-dark fw-bold">Home</a>
+      <a href="/campgrounds" class="py-2 text-dark fw-bold">Explore camps</a>
+      <a href="/#why-campvista" class="py-2 text-secondary">How it works</a>
+      <% if (currentUser && (currentUser.role === 'owner' || currentUser.role === 'admin')) { %>
+        <a href="/manage-bookings" class="py-2 text-dark fw-bold d-flex justify-content-between align-items-center">
+          Host dashboard
+          <% if (pendingBookingsCount > 0) { %>
+            <span class="badge bg-danger rounded-pill"><%= pendingBookingsCount %></span>
+          <% } %>
+        </a>
+      <% } %>
+      <% if (currentUser) { %>
+        <a href="/my-bookings" class="py-2 text-dark">My trips</a>
+      <% } else { %>
+        <hr class="my-2">
+        <a href="/login" class="btn btn-outline w-100 py-2">Log in</a>
+        <a href="/register" class="btn btn-primary w-100 py-2 mt-2">Sign up</a>
+      <% } %>
+    </div>
+  </div>
+</header>

@@ -1,60 +1,84 @@
 <% layout('layouts/boilerplate') %>
-<div class="row justify-content-center">
-    <div class="col-lg-7 col-xl-6">
-        <div class="mb-4">
-            <p class="text-uppercase text-secondary small fw-semibold mb-2">Campground details</p>
-            <h1 class="display-6 fw-bold mb-2">Edit campground</h1>
-            <p class="text-secondary mb-0">Update the information for <%= campground.title %>.</p>
-        </div>
 
-        <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="border rounded-3 p-4 shadow-sm bg-white">
-            <div class="mb-3">
-                <label for="title" class="form-label fw-semibold">Title</label>
-                <input type="text" class="form-control" id="title" name="campground[title]" value="<%= campground.title %>" required>
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="mb-4">
+                <span class="eyebrow mb-2">
+                    <span></span> UPDATE LISTING
+                </span>
+                <h1 style="font-family: var(--serif); font-size: 38px;">Edit Campground</h1>
+                <p class="text-muted">Modify details for <strong><%= campground.title %></strong>.</p>
             </div>
 
-            <div class="mb-3">
-                <label for="image" class="form-label fw-semibold">Update Image (leave blank to keep current)</label>
-                <input type="file" class="form-control" id="image" name="image" accept="image/*">
-            </div>
+            <div class="form-card">
+                <form action="/campgrounds/<%= campground.id || campground._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Campground Name</label>
+                        <input type="text" class="form-control" id="title" name="campground[title]" value="<%= campground.title %>" required>
+                    </div>
 
-            <div class="mb-3">
-                <label for="qr_code" class="form-label fw-semibold">Update Payment QR Code (leave blank to keep current)</label>
-                <input type="file" class="form-control" id="qr_code" name="qr_code" accept="image/*">
-            </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            <label for="location" class="form-label">Location / Region</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="location" name="campground[location]" value="<%= campground.location %>" required>
+                                <button class="btn btn-outline" type="button" id="locateBtn" title="Use current GPS location">
+                                    <i class="bi bi-geo-alt"></i>
+                                </button>
+                            </div>
+                            <div id="locateHelp" class="form-text d-none text-success small mt-1">Location detected successfully!</div>
+                        </div>
 
-            <div class="row g-3">
-                <div class="col-md-7">
-                    <label for="location" class="form-label fw-semibold">Location</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="location" name="campground[location]" value="<%= campground.location %>" required>
-                        <button class="btn btn-outline-secondary" type="button" id="locateBtn" title="Use current location">
-                            <i class="bi bi-geo-alt"></i>
+                        <div class="col-md-5">
+                            <label for="price" class="form-label">Price per Night</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" id="price" name="campground[price]" value="<%= campground.price %>" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="form-label">Update Cover Photo (leave blank to keep current)</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <% if (campground.image) { %>
+                            <div class="mt-2">
+                                <small class="text-muted d-block mb-1">Current cover:</small>
+                                <img src="<%= campground.image %>" alt="Current image" class="rounded-2" style="height: 70px; width: 120px; object-fit: cover;">
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="qr_code" class="form-label">Update UPI QR Code (leave blank to keep current)</label>
+                        <input type="file" class="form-control" id="qr_code" name="qr_code" accept="image/*">
+                        <% if (campground.qr_code) { %>
+                            <div class="mt-2">
+                                <small class="text-muted d-block mb-1">Current QR:</small>
+                                <img src="<%= campground.qr_code %>" alt="Current QR code" class="rounded-2 border p-1" style="height: 60px; width: 60px; object-fit: contain;">
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="campground[description]" rows="5" required><%= campground.description %></textarea>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-primary py-2 px-4">
+                            Save Changes
                         </button>
+                        <a href="/campgrounds/<%= campground.id || campground._id %>" class="btn btn-outline py-2">
+                            Cancel
+                        </a>
                     </div>
-                    <div id="locateHelp" class="form-text d-none text-success">Location found!</div>
-                </div>
-                <div class="col-md-5">
-                    <label for="price" class="form-label fw-semibold">Price</label>
-                    <div class="input-group">
-                        <span class="input-group-text">₹</span>
-                        <input type="number" class="form-control" id="price" name="campground[price]" value="<%= campground.price %>" min="0" placeholder="0" required>
-                    </div>
-                </div>
+                </form>
             </div>
-
-            <div class="mt-3 mb-4">
-                <label for="description" class="form-label fw-semibold">Description</label>
-                <textarea class="form-control" id="description" name="campground[description]" rows="5" required><%= campground.description %></textarea>
-            </div>
-
-            <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="btn btn-dark">Update campground</button>
-                <a href="/campgrounds/<%= campground._id %>" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</main>
 
 <script>
 document.getElementById('locateBtn').addEventListener('click', () => {
@@ -71,42 +95,31 @@ document.getElementById('locateBtn').addEventListener('click', () => {
     locateBtn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
             const { latitude, longitude } = position.coords;
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                .then(res => res.json())
-                .then(data => {
-                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
-                    locateBtn.disabled = false;
-                    
-                    if (data && data.display_name) {
-                        const address = data.address;
-                        const city = address.city || address.town || address.village || address.county;
-                        const state = address.state;
-                        const country = address.country;
-                        
-                        if (city && state && country) {
-                            locationInput.value = `${city}, ${state}, ${country}`;
-                        } else {
-                            locationInput.value = data.display_name;
-                        }
-                        
-                        locateHelp.classList.remove('d-none');
-                        setTimeout(() => locateHelp.classList.add('d-none'), 5000);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
-                    locateBtn.disabled = false;
-                    alert("Unable to fetch location details.");
-                });
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+                
+                if (data && data.address) {
+                    const city = data.address.city || data.address.town || data.address.village || data.address.county || "";
+                    const state = data.address.state || "";
+                    locationInput.value = `${city}${city && state ? ', ' : ''}${state}`;
+                    locateHelp.classList.remove('d-none');
+                } else {
+                    locationInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                }
+            } catch (err) {
+                locationInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            } finally {
+                locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
+                locateBtn.disabled = false;
+            }
         },
         (error) => {
-            console.error(error);
+            alert("Unable to retrieve location: " + error.message);
             locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
             locateBtn.disabled = false;
-            alert("Unable to retrieve your location.");
         }
     );
 });

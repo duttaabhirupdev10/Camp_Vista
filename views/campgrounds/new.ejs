@@ -1,46 +1,74 @@
 <% layout('layouts/boilerplate') %>
-<div class="row">
-    <h1 class="text-center">New Campground</h1>
-    <div class="col-md-6 offset-md-3">
-        <form action="/campgrounds" method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="campground[title]" required>
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="mb-4">
+                <span class="eyebrow mb-2">
+                    <span></span> HOST A CAMP
+                </span>
+                <h1 style="font-family: var(--serif); font-size: 38px;">List a New Campsite</h1>
+                <p class="text-muted">Share your scenic property with adventurers across North Bengal.</p>
             </div>
-            <div class="mb-3">
-                <label for="image" class="form-label">Upload Image</label>
-                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+
+            <div class="form-card">
+                <form action="/campgrounds" method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="title" class="form-label">Campground Name</label>
+                        <input type="text" class="form-control" id="title" name="campground[title]" placeholder="e.g. Lataguri Forest Camp" required>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            <label for="location" class="form-label">Location / Region</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="location" name="campground[location]" placeholder="e.g. Lataguri, Dooars" required>
+                                <button class="btn btn-outline" type="button" id="locateBtn" title="Use current GPS location">
+                                    <i class="bi bi-geo-alt"></i>
+                                </button>
+                            </div>
+                            <div id="locateHelp" class="form-text d-none text-success small mt-1">Location detected successfully!</div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label for="price" class="form-label">Price per Night</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" id="price" name="campground[price]" placeholder="2500" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="form-label">Camp Cover Photo</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                        <div class="form-text text-muted small">Upload high-resolution landscape images of your campsite.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="qr_code" class="form-label">Owner UPI Payment QR Code</label>
+                        <input type="file" class="form-control" id="qr_code" name="qr_code" accept="image/*" required>
+                        <div class="form-text text-muted small">Customers will scan this QR code to transfer payment directly to you.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Experience &amp; Description</label>
+                        <textarea class="form-control" id="description" name="campground[description]" rows="5" placeholder="Describe the atmosphere, nearby wildlife, trekking trails, amenities, and surroundings..." required></textarea>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-primary py-2 px-4">
+                            Publish Campground
+                        </button>
+                        <a href="/campgrounds" class="btn btn-outline py-2">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="qr_code" class="form-label">Upload Payment QR Code</label>
-                <input type="file" class="form-control" id="qr_code" name="qr_code" accept="image/*" required>
-            </div>
-            <div class="mb-3">
-                <label for="price" class="form-label">Price</label>
-                <div class="input-group">
-                    <span class="input-group-text">₹</span>
-                    <input type="number" class="form-control" id="price" name="campground[price]" placeholder="0" required>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="location" name="campground[location]" required>
-                    <button class="btn btn-outline-secondary" type="button" id="locateBtn" title="Use current location">
-                        <i class="bi bi-geo-alt"></i>
-                    </button>
-                </div>
-                <div id="locateHelp" class="form-text d-none text-success">Location found!</div>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="campground[description]" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Campground</button>
-        </form>
-        <a href="/campgrounds" class="btn btn-secondary mt-3">Back to Campgrounds</a>
+        </div>
     </div>
-</div>
+</main>
 
 <script>
 document.getElementById('locateBtn').addEventListener('click', () => {
@@ -53,51 +81,35 @@ document.getElementById('locateBtn').addEventListener('click', () => {
         return;
     }
 
-    // Indicate loading state
     locateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
     locateBtn.disabled = true;
 
     navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
             const { latitude, longitude } = position.coords;
-            // Use Nominatim API for reverse geocoding
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                .then(res => res.json())
-                .then(data => {
-                    // Reset button
-                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
-                    locateBtn.disabled = false;
-                    
-                    if (data && data.display_name) {
-                        // Extracting city, state, country or using display_name directly
-                        // For simplicity, we'll use a shortened version if available, else display_name
-                        const address = data.address;
-                        const city = address.city || address.town || address.village || address.county;
-                        const state = address.state;
-                        const country = address.country;
-                        
-                        if (city && state && country) {
-                            locationInput.value = `${city}, ${state}, ${country}`;
-                        } else {
-                            locationInput.value = data.display_name;
-                        }
-                        
-                        locateHelp.classList.remove('d-none');
-                        setTimeout(() => locateHelp.classList.add('d-none'), 5000);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
-                    locateBtn.disabled = false;
-                    alert("Unable to fetch location details.");
-                });
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data = await response.json();
+                
+                if (data && data.address) {
+                    const city = data.address.city || data.address.town || data.address.village || data.address.county || "";
+                    const state = data.address.state || "";
+                    locationInput.value = `${city}${city && state ? ', ' : ''}${state}`;
+                    locateHelp.classList.remove('d-none');
+                } else {
+                    locationInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+                }
+            } catch (err) {
+                locationInput.value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            } finally {
+                locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
+                locateBtn.disabled = false;
+            }
         },
         (error) => {
-            console.error(error);
+            alert("Unable to retrieve location: " + error.message);
             locateBtn.innerHTML = '<i class="bi bi-geo-alt"></i>';
             locateBtn.disabled = false;
-            alert("Unable to retrieve your location.");
         }
     );
 });

@@ -1,174 +1,425 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampVista | North Bengal</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: 'Outfit', sans-serif;
-            background-color: #0f172a;
-        }
+<% layout('layouts/boilerplate') %>
 
-        .hero-section {
-            height: 100vh;
-            background: linear-gradient(
-                rgba(15, 23, 42, 0.7), 
-                rgba(15, 23, 42, 0.8)
-            ), url('https://images.unsplash.com/photo-1582424161962-d249f3e9d891?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
+<!-- HERO SECTION -->
+<section class="hero" style="background-image: url('https://images.unsplash.com/photo-1503265192943-9d7eea6fc77a?auto=format&fit=crop&w=2000&q=88');">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <span class="eyebrow light">
+            <span></span> Your gateway to the wild
+        </span>
+        <h1>
+            Discover your<br>
+            next <em>escape.</em>
+        </h1>
+        <p>
+            Hidden camps, wild forests and Himalayan horizons — curated across North Bengal.
+        </p>
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 4rem;
-            max-width: 800px;
-            width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-5px);
-        }
+        <!-- Search Panel Form -->
+        <form action="/campgrounds" method="GET" class="search-panel">
+            <label class="search-main">
+                <span>Where</span>
+                <div>
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m20 20-4-4" />
+                    </svg>
+                    <input type="text" name="search" placeholder="Search destination or camp" aria-label="Destination">
+                </div>
+            </label>
 
-        .title {
-            font-size: 4.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, #4ade80, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.05em;
-        }
+            <label>
+                <span>Check in</span>
+                <div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    <input type="date" aria-label="Check in">
+                </div>
+            </label>
 
-        .subtitle {
-            font-size: 1.25rem;
-            font-weight: 300;
-            margin-bottom: 3rem;
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
+            <label>
+                <span>Check out</span>
+                <div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 10h18" />
+                    </svg>
+                    <input type="date" aria-label="Check out">
+                </div>
+            </label>
 
-        .btn-custom {
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: none;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
+            <label>
+                <span>Max Budget (₹)</span>
+                <div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 6h15a2 2 0 0 1 2 2v11H4a2 2 0 0 1-2-2V5a3 3 0 0 1 3-3h13" />
+                        <path d="M16 12h5" />
+                    </svg>
+                    <input type="number" name="maxPrice" placeholder="Any price" aria-label="Max budget">
+                </div>
+            </label>
 
-        .btn-primary-custom {
-            background: linear-gradient(135deg, #4ade80 0%, #3b82f6 100%);
-            color: white;
-            box-shadow: 0 10px 20px -10px rgba(74, 222, 128, 0.5);
-        }
+            <button type="submit" class="btn btn-primary" aria-label="Search camps">
+                Search
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-4-4" />
+                </svg>
+            </button>
+        </form>
 
-        .btn-primary-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -10px rgba(74, 222, 128, 0.7);
-            color: white;
-        }
-
-        .btn-outline-custom {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-        }
-
-        .btn-outline-custom:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .floating-elements {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(74,222,128,0.15) 0%, rgba(0,0,0,0) 70%);
-        }
-
-        .circle-1 {
-            width: 600px;
-            height: 600px;
-            top: -200px;
-            left: -200px;
-        }
-
-        .circle-2 {
-            width: 800px;
-            height: 800px;
-            bottom: -300px;
-            right: -200px;
-            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%);
-        }
-    </style>
-</head>
-<body>
-
-    <section class="hero-section">
-        <div class="floating-elements">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
+        <!-- Quick Keyword Search Suggestions -->
+        <div class="popular">
+            <span>Popular:</span>
+            <a href="/campgrounds?search=Darjeeling">Darjeeling</a>
+            <a href="/campgrounds?search=Dooars">Dooars</a>
+            <a href="/campgrounds?search=Lataguri">Lataguri</a>
+            <a href="/campgrounds?search=Jaldapara">Jaldapara</a>
+            <a href="/campgrounds?search=Kalimpong">Kalimpong</a>
         </div>
+    </div>
 
-        <div class="glass-card position-relative" style="z-index: 2;">
-            <h1 class="title">CampVista</h1>
-            <p class="subtitle">Discover the most breathtaking camping destinations across the Himalayas, Darjeeling, and the Dooars. Connect with nature like never before.</p>
-            
-            <div class="d-flex justify-content-center gap-4 flex-wrap">
-                <a href="/campgrounds" class="btn btn-custom btn-primary-custom text-decoration-none">Explore North Bengal</a>
-                
-                <% if(currentUser) { %>
-                    <% if(currentUser.role === 'customer') { %>
-                        <form action="/upgrade-role" method="POST" class="d-inline">
-                            <button class="btn btn-custom btn-outline-custom text-decoration-none">Become a Camp Owner</button>
-                        </form>
-                    <% } else { %>
-                        <a href="/campgrounds/new" class="btn btn-custom btn-outline-custom text-decoration-none">Host a Camp</a>
-                    <% } %>
-                <% } else { %>
-                    <a href="/login" class="btn btn-custom btn-outline-custom text-decoration-none">Login</a>
-                    <a href="/register" class="btn btn-custom btn-outline-custom text-decoration-none">Register</a>
-                <% } %>
+    <div class="hero-side-note">
+        <span>27.04° N</span>
+        <i></i>
+        <span>Himalayan foothills</span>
+    </div>
+</section>
+
+<!-- CURATED REGIONS SECTION -->
+<section class="section container">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">
+                <span></span> Curated destinations
+            </span>
+            <h2>Explore North Bengal</h2>
+            <p>From misty mountain trails to the wild heart of the Dooars.</p>
+        </div>
+        <a href="/campgrounds">
+            View all destinations
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+        </a>
+    </div>
+
+    <div class="destination-grid">
+        <a href="/campgrounds?search=Darjeeling" class="destination-card dest-1">
+            <img src="https://images.unsplash.com/photo-1626082895617-2c6de34f6af3?auto=format&fit=crop&w=1000&q=85" alt="Darjeeling">
+            <span class="shade"></span>
+            <span class="destination-copy">
+                <small>01</small>
+                <strong>Darjeeling</strong>
+                <em>Misty peaks & tea trails</em>
+            </span>
+            <i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </i>
+        </a>
+
+        <a href="/campgrounds?search=Dooars" class="destination-card dest-2">
+            <img src="https://images.unsplash.com/photo-1579063890939-deb71d85a91a?auto=format&fit=crop&w=1000&q=85" alt="Dooars">
+            <span class="shade"></span>
+            <span class="destination-copy">
+                <small>02</small>
+                <strong>Dooars</strong>
+                <em>Wild forests & rivers</em>
+            </span>
+            <i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </i>
+        </a>
+
+        <a href="/campgrounds?search=Jaldapara" class="destination-card dest-3">
+            <img src="https://images.unsplash.com/photo-1608048328465-84421e96c412?auto=format&fit=crop&w=1000&q=85" alt="Jaldapara">
+            <span class="shade"></span>
+            <span class="destination-copy">
+                <small>03</small>
+                <strong>Jaldapara</strong>
+                <em>Jungle & wildlife</em>
+            </span>
+            <i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </i>
+        </a>
+
+        <a href="/campgrounds?search=Kalimpong" class="destination-card dest-4">
+            <img src="https://images.unsplash.com/photo-1455157823797-3019317cbcf0?auto=format&fit=crop&w=1000&q=85" alt="Kalimpong">
+            <span class="shade"></span>
+            <span class="destination-copy">
+                <small>04</small>
+                <strong>Kalimpong</strong>
+                <em>Hillside hideaways</em>
+            </span>
+            <i>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </i>
+        </a>
+    </div>
+</section>
+
+<!-- POPULAR CAMPS SECTION -->
+<section class="section popular-section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">
+                    <span></span> Loved by travellers
+                </span>
+                <h2>Popular camps</h2>
+                <p>One-of-a-kind stays, chosen for their setting, story and soul.</p>
             </div>
+            <a href="/campgrounds">
+                Explore all camps
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </a>
         </div>
-    </section>
 
-</body>
-</html>
+        <div class="camp-grid">
+            <% if (typeof campgrounds !== 'undefined' && campgrounds && campgrounds.length > 0) { %>
+                <% for (let camp of campgrounds.slice(0, 3)) { %>
+                    <article class="camp-card">
+                        <div class="camp-image-wrap">
+                            <img src="<%= camp.image || 'https://images.unsplash.com/photo-1715092387304-ef4d5f41ffdb?auto=format&fit=crop&w=1000&q=85' %>" alt="<%= camp.title %>">
+                            <span class="image-tag">Guest favourite</span>
+                            <button class="heart" type="button" aria-label="Save camp">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="camp-card-body">
+                            <div class="camp-meta">
+                                <span>Nature stay</span>
+                                <span class="rating">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d">
+                                        <path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" />
+                                    </svg>
+                                    4.9 <em>(reviews)</em>
+                                </span>
+                            </div>
+                            <h3><%= camp.title %></h3>
+                            <p>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+                                    <circle cx="12" cy="10" r="2.5" />
+                                </svg>
+                                <%= camp.location %>
+                            </p>
+                            <div class="card-foot">
+                                <div>
+                                    <strong>₹<%= camp.price ? Number(camp.price).toLocaleString('en-IN') : 0 %></strong>
+                                    <span> / night</span>
+                                </div>
+                                <a href="/campgrounds/<%= camp.id %>">
+                                    View details
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M5 12h14M13 6l6 6-6 6" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                <% } %>
+            <% } else { %>
+                <!-- Curated fallback stays if database is empty -->
+                <article class="camp-card">
+                    <div class="camp-image-wrap">
+                        <img src="https://images.unsplash.com/photo-1715092387304-ef4d5f41ffdb?auto=format&fit=crop&w=1000&q=85" alt="Lataguri Forest Camp">
+                        <span class="image-tag">Guest favourite</span>
+                        <button class="heart" type="button" aria-label="Save camp">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="camp-card-body">
+                        <div class="camp-meta">
+                            <span>Forest camp</span>
+                            <span class="rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d"><path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" /></svg>
+                                4.9 <em>(124)</em>
+                            </span>
+                        </div>
+                        <h3>Lataguri Forest Camp</h3>
+                        <p>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                            Lataguri, Dooars
+                        </p>
+                        <div class="card-foot">
+                            <div><strong>₹2,500</strong><span> / night</span></div>
+                            <a href="/campgrounds">View details <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="camp-card">
+                    <div class="camp-image-wrap">
+                        <img src="https://images.unsplash.com/photo-1608048328465-84421e96c412?auto=format&fit=crop&w=1000&q=85" alt="Jaldapara Jungle Retreat">
+                        <span class="image-tag">Wildlife escape</span>
+                        <button class="heart" type="button" aria-label="Save camp">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="camp-card-body">
+                        <div class="camp-meta">
+                            <span>Jungle stay</span>
+                            <span class="rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d"><path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" /></svg>
+                                4.8 <em>(86)</em>
+                            </span>
+                        </div>
+                        <h3>Jaldapara Jungle Retreat</h3>
+                        <p>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                            Jaldapara, Alipurduar
+                        </p>
+                        <div class="card-foot">
+                            <div><strong>₹3,200</strong><span> / night</span></div>
+                            <a href="/campgrounds">View details <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="camp-card">
+                    <div class="camp-image-wrap">
+                        <img src="https://images.unsplash.com/photo-1554867874-19fcf1c51d5c?auto=format&fit=crop&w=1000&q=85" alt="Jhalong River Camp">
+                        <span class="image-tag">Riverside</span>
+                        <button class="heart" type="button" aria-label="Save camp">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="camp-card-body">
+                        <div class="camp-meta">
+                            <span>River camp</span>
+                            <span class="rating">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#c8743d" stroke="#c8743d"><path d="m12 2 3 6 6.5 1-4.7 4.6 1.1 6.4-5.9-3.1L6.1 20l1.1-6.4L2.5 9 9 8l3-6Z" /></svg>
+                                4.7 <em>(68)</em>
+                            </span>
+                        </div>
+                        <h3>Jhalong River Camp</h3>
+                        <p>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
+                            Jhalong, Kalimpong
+                        </p>
+                        <div class="card-foot">
+                            <div><strong>₹2,800</strong><span> / night</span></div>
+                            <a href="/campgrounds">View details <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
+                        </div>
+                    </div>
+                </article>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- WHY CAMPVISTA SECTION -->
+<section class="section why-section container" id="why-campvista">
+    <div class="why-intro">
+        <span class="eyebrow">
+            <span></span> Why CampVista
+        </span>
+        <h2>
+            Wild places.<br>
+            <em>Peace of mind.</em>
+        </h2>
+        <p>
+            We make getting away feel effortless, so you can spend less time planning and more time outside in nature.
+        </p>
+        <a href="/campgrounds" class="btn btn-outline">
+            How it works
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+        </a>
+    </div>
+
+    <div class="feature-grid">
+        <article class="feature">
+            <span>01</span>
+            <i>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z" />
+                    <path d="m9 12 2 2 4-4" />
+                </svg>
+            </i>
+            <h3>Verified stays</h3>
+            <p>Every camp is personally vetted for hygiene, safety, authentic wilderness surroundings, and hospitality.</p>
+        </article>
+
+        <article class="feature">
+            <span>02</span>
+            <i>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 10h18" />
+                </svg>
+            </i>
+            <h3>Easy booking</h3>
+            <p>Direct date selection, clear night breakdowns, and instant confirmation from verified campsite owners.</p>
+        </article>
+
+        <article class="feature">
+            <span>03</span>
+            <i>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 6h15a2 2 0 0 1 2 2v11H4a2 2 0 0 1-2-2V5a3 3 0 0 1 3-3h13" />
+                    <path d="M16 12h5" />
+                </svg>
+            </i>
+            <h3>Direct UPI QR</h3>
+            <p>Convenient UPI payments straight to the campground host with transparent pricing and zero hidden fees.</p>
+        </article>
+
+        <article class="feature">
+            <span>04</span>
+            <i>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" />
+                </svg>
+            </i>
+            <h3>Hidden places</h3>
+            <p>Discover private riverside camps, forest hideaways, and high-altitude tea trails off the crowded tourist route.</p>
+        </article>
+    </div>
+</section>
+
+<!-- CALL TO ACTION SECTION -->
+<section class="container cta" style="background-image: url('https://images.unsplash.com/photo-1554867874-19fcf1c51d5c?auto=format&fit=crop&w=1600&q=85');">
+    <div>
+        <span class="eyebrow light">
+            <span></span> Answer the call
+        </span>
+        <h2>
+            Your next adventure<br>
+            is waiting.
+        </h2>
+        <p>
+            Leave the ordinary behind. North Bengal is closer than you think.
+        </p>
+        <a href="/campgrounds" class="btn btn-secondary">
+            Explore camps
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+        </a>
+    </div>
+</section>
