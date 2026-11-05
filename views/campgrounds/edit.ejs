@@ -56,7 +56,7 @@
                         <% if (campground.qr_code) { %>
                             <div class="mt-2">
                                 <small class="text-muted d-block mb-1">Current QR:</small>
-                                <img src="<%= campground.qr_code %>" alt="Current QR code" class="rounded-2 border p-1" style="height: 60px; width: 60px; object-fit: contain;">
+                                <img src="<%= campground.qr_code %>" onerror="this.onerror=null; this.src='/images/abhirup-upi-qr.jpg';" alt="Current QR code" class="rounded-2 border p-1" style="height: 60px; width: 60px; object-fit: contain;">
                             </div>
                         <% } %>
                     </div>

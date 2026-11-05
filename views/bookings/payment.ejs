@@ -30,17 +30,17 @@
                     <!-- Owner's QR Code -->
                     <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-2 border">
                         <% if (campground.qr_code) { %>
-                            <img src="<%= campground.qr_code %>" alt="Owner UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
+                            <img src="<%= campground.qr_code %>" onerror="this.onerror=null; this.src='/images/abhirup-upi-qr.jpg';" alt="Owner UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
                         <% } else { %>
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=campvista@upi&pn=CampVista&am=<%= total_price %>&cu=INR" alt="UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px;">
+                            <img src="/images/abhirup-upi-qr.jpg" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=adutta.jpg2005@okhdfcbank&pn=Abhirup%20Dutta&am=<%= total_price %>&cu=INR';" alt="UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
                         <% } %>
                     </div>
                     
                     <p class="small text-muted mb-2">Scan with Google Pay, PhonePe, Paytm or any UPI app to pay.</p>
                     
                     <!-- Copy UPI ID Helper Button -->
-                    <button type="button" class="btn btn-outline btn-sm py-1 px-3 mt-1" id="copyUpiBtn" onclick="navigator.clipboard.writeText('campvista@upi'); this.innerText = 'Copied!'; setTimeout(() => this.innerText = 'Copy UPI ID: campvista@upi', 2000);">
-                        <i class="bi bi-clipboard me-1"></i> Copy UPI ID: campvista@upi
+                    <button type="button" class="btn btn-outline btn-sm py-1 px-3 mt-1" id="copyUpiBtn" onclick="navigator.clipboard.writeText('adutta.jpg2005@okhdfcbank'); this.innerText = 'Copied!'; setTimeout(() => this.innerText = 'Copy UPI ID: adutta.jpg2005@okhdfcbank', 2000);">
+                        <i class="bi bi-clipboard me-1"></i> Copy UPI ID: adutta.jpg2005@okhdfcbank
                     </button>
                 </div>
 

@@ -256,18 +256,33 @@
                         </div>
                     </div>
 
-                    <p class="secure">
+                    <p class="secure mb-2">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
                         Secure booking &middot; Direct UPI payment
                     </p>
+
+                    <% if (campground.qr_code) { %>
+                        <div class="text-center mt-3 pt-3 border-top">
+                            <span class="text-muted small d-block mb-2"><i class="bi bi-qr-code-scan me-1"></i> Host Payment QR</span>
+                            <img src="<%= campground.qr_code %>" onerror="this.onerror=null; this.src='/images/abhirup-upi-qr.jpg';" alt="Host UPI QR Code" class="img-thumbnail rounded-3" style="max-width: 130px; height: 130px; object-fit: contain;">
+                            <small class="d-block text-muted mt-1" style="font-size: 11px;">Scan with Google Pay, PhonePe, Paytm</small>
+                        </div>
+                    <% } %>
                 </form>
             <% } else { %>
                 <div class="text-center py-3">
                     <p class="text-muted small mb-3">Sign in to check availability and reserve your campsite.</p>
-                    <a href="/login" class="btn btn-primary w-100">Login to Reserve</a>
+                    <a href="/login" class="btn btn-primary w-100 mb-3">Login to Reserve</a>
+                    <% if (campground.qr_code) { %>
+                        <div class="pt-3 border-top">
+                            <span class="text-muted small d-block mb-2"><i class="bi bi-qr-code-scan me-1"></i> Host Payment QR</span>
+                            <img src="<%= campground.qr_code %>" onerror="this.onerror=null; this.src='/images/abhirup-upi-qr.jpg';" alt="Host UPI QR Code" class="img-thumbnail rounded-3" style="max-width: 130px; height: 130px; object-fit: contain;">
+                            <small class="d-block text-muted mt-1" style="font-size: 11px;">Direct host UPI payment</small>
+                        </div>
+                    <% } %>
                 </div>
             <% } %>
         </aside>
