@@ -8,10 +8,14 @@ const ownerController = {
                 return res.redirect('/campgrounds');
             }
 
-            const { data: bookings, error } = await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
+            const isAdmin = res.locals.currentUser.role === 'admin';
+            const { data: bookings, error } = isAdmin
+                ? await bookingModel.findAllBookings()
+                : await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
+
             if (error) throw error;
 
-            res.render('owner/manage-bookings', { bookings });
+            res.render('owner/manage-bookings', { bookings, isAdmin });
         } catch (error) {
             console.error(error);
             res.send('Error fetching bookings');

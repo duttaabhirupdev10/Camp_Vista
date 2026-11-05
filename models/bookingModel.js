@@ -57,6 +57,21 @@ const bookingModel = {
         }
     },
 
+    async findAllBookings() {
+        try {
+            const data = await prisma.bookings.findMany({
+                include: {
+                    campgrounds: { select: { id: true, title: true, owner: true, image: true, location: true } },
+                    users: { select: { id: true, email: true } }
+                },
+                orderBy: { created_at: 'desc' }
+            });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
     async findBookingsByOwnerId(ownerId) {
         try {
             const data = await prisma.bookings.findMany({
@@ -64,8 +79,8 @@ const bookingModel = {
                     campgrounds: { owner: ownerId }
                 },
                 include: {
-                    campgrounds: { select: { title: true, owner: true } },
-                    users: { select: { email: true } }
+                    campgrounds: { select: { id: true, title: true, owner: true, image: true, location: true } },
+                    users: { select: { id: true, email: true } }
                 },
                 orderBy: { created_at: 'desc' }
             });

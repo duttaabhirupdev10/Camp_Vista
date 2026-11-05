@@ -68,7 +68,10 @@ app.use(async (req, res, next) => {
     if (res.locals.currentUser && (res.locals.currentUser.role === 'owner' || res.locals.currentUser.role === 'admin')) {
         try {
             const bookingModel = require('./models/bookingModel');
-            const { data } = await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
+            const isAdmin = res.locals.currentUser.role === 'admin';
+            const { data } = isAdmin 
+                ? await bookingModel.findAllBookings()
+                : await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
             if (data) {
                 res.locals.pendingBookingsCount = data.filter(b => b.status === 'pending').length;
             }
