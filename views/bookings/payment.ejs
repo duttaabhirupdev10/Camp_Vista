@@ -1,5 +1,13 @@
 <% layout('layouts/boilerplate') %>
 
+<%
+    const m = (typeof members !== 'undefined' && members) ? Number(members) : 1;
+    const n = (typeof nights !== 'undefined' && nights) ? Number(nights) : 1;
+    const sub = (typeof subtotal !== 'undefined' && subtotal) ? Number(subtotal) : (Number(campground.price || 0) * n * m);
+    const fee = (typeof service_fee !== 'undefined' && service_fee) ? Number(service_fee) : Math.round(sub * 0.05);
+    const tot = (typeof total_price !== 'undefined' && total_price) ? Number(total_price) : (sub + fee);
+%>
+
 <main class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-5">
@@ -17,22 +25,38 @@
                     <span></span> SECURE CHECKOUT
                 </span>
                 <h2 class="mb-2" style="font-family: var(--serif); font-size: 32px;">Complete Payment</h2>
-                <p class="text-muted small mb-4">
+                <p class="text-muted small mb-3">
                     Reserving <strong><%= campground.title %></strong><br>
-                    <%= check_in %> &rarr; <%= check_out %>
+                    <span><%= check_in %> &rarr; <%= check_out %> &middot; <strong><%= n %> night<%= n > 1 ? 's' : '' %></strong> &middot; <strong><%= m %> <%= m > 1 ? 'campers' : 'camper' %></strong></span>
                 </p>
 
                 <!-- Amount Box -->
                 <div class="p-4 rounded-3 mb-4" style="background-color: var(--cream); border: 1px solid var(--sand);">
                     <span class="text-muted text-uppercase fw-bold small d-block mb-1" style="letter-spacing: 1px; font-size: 10px;">Total Amount Due</span>
-                    <h1 class="display-6 fw-bold mb-3" style="color: var(--forest);">₹<%= Number(total_price).toLocaleString('en-IN') %></h1>
+                    <h1 class="display-6 fw-bold mb-3" style="color: var(--forest);">₹<%= Number(tot).toLocaleString('en-IN') %></h1>
+
+                    <!-- Detailed Price Breakdown Card -->
+                    <div class="bg-white rounded-3 p-3 mb-3 border text-start small">
+                        <div class="d-flex justify-content-between text-muted mb-1">
+                            <span>₹<%= Number(campground.price).toLocaleString('en-IN') %> &times; <%= n %> night<%= n > 1 ? 's' : '' %> &times; <%= m %> <%= m > 1 ? 'campers' : 'camper' %></span>
+                            <span class="fw-semibold text-dark">₹<%= Number(sub).toLocaleString('en-IN') %></span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted mb-1">
+                            <span>Service &amp; maintenance fee (5%)</span>
+                            <span class="fw-semibold text-dark">₹<%= Number(fee).toLocaleString('en-IN') %></span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-2 border-top fw-bold text-dark">
+                            <span>Total Payable</span>
+                            <span class="text-success">₹<%= Number(tot).toLocaleString('en-IN') %></span>
+                        </div>
+                    </div>
 
                     <!-- Owner's QR Code -->
                     <div class="p-3 bg-white rounded-3 d-inline-block shadow-sm mb-2 border">
                         <% if (campground.qr_code) { %>
                             <img src="<%= campground.qr_code %>" onerror="this.onerror=null; this.src='/images/abhirup-upi-qr.jpg';" alt="Owner UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
                         <% } else { %>
-                            <img src="/images/abhirup-upi-qr.jpg" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=adutta.jpg2005@okhdfcbank&pn=Abhirup%20Dutta&am=<%= total_price %>&cu=INR';" alt="UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
+                            <img src="/images/abhirup-upi-qr.jpg" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=adutta.jpg2005@okhdfcbank&pn=Abhirup%20Dutta&am=<%= tot %>&cu=INR';" alt="UPI QR Code" class="img-fluid" style="max-width: 190px; height: 190px; object-fit: contain;">
                         <% } %>
                     </div>
                     
@@ -48,7 +72,9 @@
                 <form action="/campgrounds/<%= campground.id %>/confirm-payment" method="POST">
                     <input type="hidden" name="check_in" value="<%= check_in %>">
                     <input type="hidden" name="check_out" value="<%= check_out %>">
-                    <input type="hidden" name="total_price" value="<%= total_price %>">
+                    <input type="hidden" name="members" value="<%= m %>">
+                    <input type="hidden" name="nights" value="<%= n %>">
+                    <input type="hidden" name="total_price" value="<%= tot %>">
                     
                     <button type="submit" class="btn btn-primary w-100 py-3 mb-3">
                         <i class="bi bi-check-circle-fill me-1"></i> I Have Completed the Payment

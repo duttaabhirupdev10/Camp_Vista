@@ -227,12 +227,18 @@
                             <input type="date" id="check_out" name="check_out" required>
                         </label>
                         <label class="guest-field">
-                            <span>CAMPERS</span>
-                            <select aria-label="Guests">
-                                <option>2 campers</option>
-                                <option>1 camper</option>
-                                <option>3 campers</option>
-                                <option>4+ campers</option>
+                            <span>CAMPERS / MEMBERS</span>
+                            <select name="members" id="members" aria-label="Campers / Members" required>
+                                <option value="1">1 camper</option>
+                                <option value="2" selected>2 campers</option>
+                                <option value="3">3 campers</option>
+                                <option value="4">4 campers</option>
+                                <option value="5">5 campers</option>
+                                <option value="6">6 campers</option>
+                                <option value="7">7 campers</option>
+                                <option value="8">8 campers</option>
+                                <option value="9">9 campers</option>
+                                <option value="10">10 campers</option>
                             </select>
                         </label>
                     </div>
@@ -295,43 +301,113 @@
     const campPrice = <%= campground.price || 0 %>;
     const checkInInput = document.getElementById('check_in');
     const checkOutInput = document.getElementById('check_out');
+    const membersInput = document.getElementById('members');
+    const reserveBtn = document.getElementById('reserveBtn');
     const priceLines = document.getElementById('priceLines');
     const rateCalculation = document.getElementById('rateCalculation');
     const subtotalAmount = document.getElementById('subtotalAmount');
     const serviceFeeAmount = document.getElementById('serviceFeeAmount');
     const totalAmount = document.getElementById('totalAmount');
 
+    function formatDateYMD(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function calculateNights(cin, cout) {
+        if (!cin || !cout) return 0;
+        const [y1, m1, d1] = cin.split('-').map(Number);
+        const [y2, m2, d2] = cout.split('-').map(Number);
+        if ([y1, m1, d1, y2, m2, d2].some(isNaN)) return 0;
+        const utc1 = Date.UTC(y1, m1 - 1, d1);
+        const utc2 = Date.UTC(y2, m2 - 1, d2);
+        return Math.round((utc2 - utc1) / (1000 * 60 * 60 * 24));
+    }
+
     // Dynamic Live Price Calculator
     function updatePricing() {
-        if (!checkInInput || !checkOutInput || !checkInInput.value || !checkOutInput.value) return;
-        const d1 = new Date(checkInInput.value);
-        const d2 = new Date(checkOutInput.value);
-        const diffTime = d2 - d1;
-        const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (!checkInInput || !checkOutInput || !checkInInput.value || !checkOutInput.value) {
+            if (priceLines) priceLines.style.display = 'none';
+            return;
+        }
+
+        const nights = calculateNights(checkInInput.value, checkOutInput.value);
+        const members = parseInt(membersInput ? membersInput.value : 1, 10) || 1;
+
         if (nights > 0) {
             priceLines.style.display = 'grid';
-            const subtotal = campPrice * nights;
+            const subtotal = campPrice * nights * members;
             const fee = Math.round(subtotal * 0.05);
             const total = subtotal + fee;
-            rateCalculation.innerHTML = `₹${campPrice.toLocaleString('en-IN')} &times; ${nights} night${nights > 1 ? 's' : ''}`;
+
+            const nightsText = `${nights} night${nights > 1 ? 's' : ''}`;
+            const membersText = `${members} camper${members > 1 ? 's' : ''}`;
+            rateCalculation.innerHTML = `₹${campPrice.toLocaleString('en-IN')} &times; ${nightsText} &times; ${membersText}`;
             subtotalAmount.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
             serviceFeeAmount.textContent = `₹${fee.toLocaleString('en-IN')}`;
             totalAmount.textContent = `₹${total.toLocaleString('en-IN')}`;
+            if (reserveBtn) {
+                reserveBtn.disabled = false;
+                reserveBtn.innerText = 'Reserve now';
+            }
         } else {
             priceLines.style.display = 'none';
+            if (reserveBtn) {
+                reserveBtn.disabled = true;
+                reserveBtn.innerText = 'Select valid dates';
+            }
         }
     }
 
     if (checkInInput && checkOutInput) {
-        // Set default minimum date to today
-        const today = new Date().toISOString().split('T')[0];
-        checkInInput.min = today;
-        checkOutInput.min = today;
+        const today = new Date();
+        const todayStr = formatDateYMD(today);
+        checkInInput.min = todayStr;
+
+        if (!checkInInput.value) {
+            checkInInput.value = todayStr;
+        }
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = formatDateYMD(tomorrow);
+
+        checkOutInput.min = tomorrowStr;
+        if (!checkOutInput.value) {
+            checkOutInput.value = tomorrowStr;
+        }
+
         checkInInput.addEventListener('change', () => {
-            checkOutInput.min = checkInInput.value;
+            if (checkInInput.value) {
+                const [y, m, d] = checkInInput.value.split('-').map(Number);
+                const nextDay = new Date(y, m - 1, d + 1);
+                const minCheckOut = formatDateYMD(nextDay);
+                checkOutInput.min = minCheckOut;
+
+                if (!checkOutInput.value || checkOutInput.value <= checkInInput.value) {
+                    checkOutInput.value = minCheckOut;
+                }
+            }
             updatePricing();
         });
-        checkOutInput.addEventListener('change', updatePricing);
+
+        checkOutInput.addEventListener('change', () => {
+            if (checkInInput.value && checkOutInput.value <= checkInInput.value) {
+                const [y, m, d] = checkInInput.value.split('-').map(Number);
+                const nextDay = new Date(y, m - 1, d + 1);
+                checkOutInput.value = formatDateYMD(nextDay);
+            }
+            updatePricing();
+        });
+
+        if (membersInput) {
+            membersInput.addEventListener('change', updatePricing);
+        }
+
+        // Initialize live price breakdown on page load
+        updatePricing();
     }
 
     // Leaflet Map & Geolocation Distance
