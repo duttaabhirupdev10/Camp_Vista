@@ -1,6 +1,5 @@
 const bookingModel = require('../models/bookingModel');
 const campgroundService = require('../services/campgroundService');
-const mailer = require('../utils/mailer');
 
 const ownerController = {
     async manageBookings(req, res) {

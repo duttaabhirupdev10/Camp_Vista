@@ -79,3 +79,4 @@ The column `campgrounds.total_rooms` does not exist in the current database.
 [2026-11-12 13:49:13] info: Server is running on port 3000
 [2026-11-12 13:49:51] info: Server is running on port 3000
 [2026-11-12 13:56:39] info: Server is running on port 3000
+[2026-11-12 14:06:30] info: Server is running on port 3000
