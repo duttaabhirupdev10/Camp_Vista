@@ -2,6 +2,13 @@ const bookingModel = require('../models/bookingModel');
 const campgroundModel = require('../models/campgroundModel');
 const campgroundService = require('../services/campgroundService');
 
+function redirectBookingError(res, campgroundId, errorCode, check_in, check_out) {
+    const params = new URLSearchParams({ error: errorCode });
+    if (check_in) params.set('check_in', check_in);
+    if (check_out) params.set('check_out', check_out);
+    return res.redirect(`/campgrounds/${campgroundId}?${params.toString()}`);
+}
+
 const bookingController = {
     async showPaymentPage(req, res) {
         try {
@@ -12,12 +19,14 @@ const bookingController = {
             const { data: campground, error: campError } = await campgroundModel.findById(campgroundId);
             if (campError || !campground) return res.status(404).send('Campground not found');
 
+            const roomCapacity = Math.max(1, Number(campground.room_capacity ?? 2));
+            if (members > roomCapacity) {
+                return redirectBookingError(res, campgroundId, 'exceeds_capacity', check_in, check_out);
+            }
+
             const { data: availability } = await campgroundService.getAvailability(campgroundId, check_in, check_out);
             if (!availability || availability.available_rooms <= 0) {
-                const params = new URLSearchParams({ error: 'no_rooms' });
-                if (check_in) params.set('check_in', check_in);
-                if (check_out) params.set('check_out', check_out);
-                return res.redirect(`/campgrounds/${campgroundId}?${params.toString()}`);
+                return redirectBookingError(res, campgroundId, 'no_rooms', check_in, check_out);
             }
 
             let nights = 1;
@@ -57,6 +66,15 @@ const bookingController = {
             const campgroundId = req.params.id;
             const userId = res.locals.currentUser.id;
             const { check_in, check_out, total_price } = req.body;
+            const members = Math.max(1, parseInt(req.body.members || 1, 10));
+
+            const { data: campground, error: campError } = await campgroundModel.findById(campgroundId);
+            if (campError || !campground) return res.status(404).send('Campground not found');
+
+            const roomCapacity = Math.max(1, Number(campground.room_capacity ?? 2));
+            if (members > roomCapacity) {
+                return redirectBookingError(res, campgroundId, 'exceeds_capacity', check_in, check_out);
+            }
 
             const booking = {
                 campground_id: campgroundId,
@@ -69,10 +87,7 @@ const bookingController = {
 
             const { error: bookingError, unavailable } = await bookingModel.createIfRoomAvailable(booking);
             if (unavailable) {
-                const params = new URLSearchParams({ error: 'no_rooms' });
-                if (check_in) params.set('check_in', check_in);
-                if (check_out) params.set('check_out', check_out);
-                return res.redirect(`/campgrounds/${campgroundId}?${params.toString()}`);
+                return redirectBookingError(res, campgroundId, 'no_rooms', check_in, check_out);
             }
             if (bookingError) throw bookingError;
 

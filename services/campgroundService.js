@@ -4,12 +4,15 @@ const { computeAvailability } = require('../utils/availability');
 function withAvailability(campground, checkIn = null, checkOut = null) {
     const { bookings = [], ...rest } = campground;
     const availability = computeAvailability(rest, bookings, checkIn, checkOut);
+    const rawCap = rest.room_capacity !== undefined && rest.room_capacity !== null ? Number(rest.room_capacity) : 2;
+    const roomCapacity = Number.isFinite(rawCap) ? Math.max(1, Math.floor(rawCap)) : 2;
     return {
         ...rest,
         _id: rest.id,
         total_rooms: availability.total_rooms,
         booked_rooms: availability.booked_rooms,
-        available_rooms: availability.available_rooms
+        available_rooms: availability.available_rooms,
+        room_capacity: roomCapacity
     };
 }
 

@@ -17,18 +17,19 @@ model users {
 }
 
 model campgrounds {
-  id          String     @id @default(uuid())
-  title       String
-  location    String
-  price       Float
-  total_rooms Int        @default(5)
-  image       String?
-  qr_code     String?
-  description String?
-  owner       String
-  users       users      @relation(fields: [owner], references: [id])
-  bookings    bookings[]
-  reviews     reviews[]
+  id            String     @id @default(uuid())
+  title         String
+  location      String
+  price         Float
+  total_rooms   Int        @default(5)
+  room_capacity Int        @default(2)
+  image         String?
+  qr_code       String?
+  description   String?
+  owner         String
+  users         users      @relation(fields: [owner], references: [id])
+  bookings      bookings[]
+  reviews       reviews[]
 }
 
 model bookings {

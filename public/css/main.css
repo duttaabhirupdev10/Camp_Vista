@@ -687,7 +687,25 @@ h1 em, h2 em {
 
 /* Room Availability Badges */
 .camp-availability {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 14px;
+}
+
+.capacity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  background: #f1f4f2;
+  color: var(--forest);
+  border: 1px solid #d9e2dc;
 }
 
 .availability-badge {

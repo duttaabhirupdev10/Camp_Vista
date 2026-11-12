@@ -99,6 +99,22 @@ app.use("/", ownerRoutes);
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
 
-app.listen(3000, () => {
-    logger.info("Server is running on port 3000");
+async function ensureDatabaseSchema() {
+    try {
+        const prisma = require('./utils/prisma');
+        await prisma.$executeRawUnsafe(
+            'ALTER TABLE "campgrounds" ADD COLUMN IF NOT EXISTS "total_rooms" INTEGER NOT NULL DEFAULT 5;'
+        );
+        await prisma.$executeRawUnsafe(
+            'ALTER TABLE "campgrounds" ADD COLUMN IF NOT EXISTS "room_capacity" INTEGER NOT NULL DEFAULT 2;'
+        );
+    } catch (err) {
+        logger.error(`Database schema check failed: ${err.message}`);
+    }
+}
+
+ensureDatabaseSchema().finally(() => {
+    app.listen(3000, () => {
+        logger.info("Server is running on port 3000");
+    });
 });

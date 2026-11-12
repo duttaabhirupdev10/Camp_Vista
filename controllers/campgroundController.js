@@ -9,6 +9,10 @@ function parseCampgroundFields(payload) {
         const parsedRooms = parseInt(payload.total_rooms, 10);
         payload.total_rooms = Number.isNaN(parsedRooms) ? 5 : Math.max(0, parsedRooms);
     }
+    if (payload.room_capacity !== undefined && payload.room_capacity !== '') {
+        const parsedCapacity = parseInt(payload.room_capacity, 10);
+        payload.room_capacity = Number.isNaN(parsedCapacity) ? 2 : Math.max(1, parsedCapacity);
+    }
 }
 
 const campgroundController = {
@@ -68,7 +72,11 @@ const campgroundController = {
             check_out: req.query.check_out || ''
         };
         const { data: campground, error } = await campgroundService.getCampground(req.params.id, selectedDates);
-        if (error || !campground) return res.send('Campground not found');
+        if (error) {
+            console.error(error);
+            return res.status(500).send('Error loading campground details');
+        }
+        if (!campground) return res.status(404).send('Campground not found');
 
         campground._id = campground.id;
         res.render('campgrounds/show', {

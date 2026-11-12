@@ -137,7 +137,10 @@
                         <% } %>
 
                         <div class="camp-availability">
-                            <% const availRooms = Number(campground.available_rooms ?? 0); %>
+                            <%
+                                const availRooms = Number(campground.available_rooms ?? 0);
+                                const roomCap = Math.max(1, Number(campground.room_capacity ?? 2));
+                            %>
                             <% if (availRooms > 0) { %>
                                 <span class="availability-badge available">
                                     <i class="bi bi-door-open"></i>
@@ -149,6 +152,10 @@
                                     No rooms available
                                 </span>
                             <% } %>
+                            <span class="capacity-badge">
+                                <i class="bi bi-people"></i>
+                                Max <%= roomCap %> <%= roomCap === 1 ? 'person' : 'people' %>/room
+                            </span>
                         </div>
 
                         <%

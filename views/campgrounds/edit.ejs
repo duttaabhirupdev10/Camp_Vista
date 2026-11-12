@@ -39,10 +39,18 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="total_rooms" class="form-label">Total Rooms</label>
-                        <input type="number" class="form-control" id="total_rooms" name="campground[total_rooms]" value="<%= (campground.total_rooms !== undefined && campground.total_rooms !== null) ? campground.total_rooms : 5 %>" min="0" required>
-                        <div class="form-text text-muted small">Total rooms or tents at this property (set to 0 if no rooms are available).</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="total_rooms" class="form-label">Total Rooms</label>
+                            <input type="number" class="form-control" id="total_rooms" name="campground[total_rooms]" value="<%= (campground.total_rooms !== undefined && campground.total_rooms !== null) ? campground.total_rooms : 5 %>" min="0" required>
+                            <div class="form-text text-muted small">Total rooms or tents (set to 0 if none available).</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="room_capacity" class="form-label">Max People per Room</label>
+                            <input type="number" class="form-control" id="room_capacity" name="campground[room_capacity]" value="<%= (campground.room_capacity !== undefined && campground.room_capacity !== null) ? campground.room_capacity : 2 %>" min="1" required>
+                            <div class="form-text text-muted small">How many people are allowed to stay together in one room.</div>
+                        </div>
                     </div>
 
                     <div class="mb-4">

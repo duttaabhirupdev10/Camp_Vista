@@ -25,6 +25,7 @@
     <%
         const availRooms = Number(campground.available_rooms ?? 0);
         const totalRooms = Number(campground.total_rooms ?? 5);
+        const roomCapacity = Math.max(1, Number(campground.room_capacity ?? 2));
     %>
 
     <!-- Detail Heading -->
@@ -53,6 +54,10 @@
                         <i class="bi bi-x-circle"></i>
                         No rooms available
                     <% } %>
+                </span>
+                <span class="capacity-badge ms-1">
+                    <i class="bi bi-people"></i>
+                    Up to <%= roomCapacity %> <%= roomCapacity === 1 ? 'person' : 'people' %> / room
                 </span>
                 <span id="distanceBadge" class="badge bg-success ms-2 d-none">Calculating distance...</span>
                 <a href="https://www.google.com/maps/dir/?api=1&destination=<%= encodeURIComponent(campground.location) %>" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline ms-2">
@@ -247,6 +252,11 @@
                     <i class="bi bi-exclamation-triangle-fill me-1"></i>
                     No rooms are available for the selected dates. Please try different dates.
                 </div>
+            <% } else if (typeof bookingError !== 'undefined' && bookingError === 'exceeds_capacity') { %>
+                <div class="alert alert-danger py-2 px-3 small mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    Maximum <%= roomCapacity %> <%= roomCapacity === 1 ? 'person is' : 'people are' %> allowed to stay together in a room at this property.
+                </div>
             <% } %>
 
             <% if (currentUser) { %>
@@ -261,18 +271,14 @@
                             <input type="date" id="check_out" name="check_out" value="<%= (typeof selectedDates !== 'undefined' && selectedDates && selectedDates.check_out) ? selectedDates.check_out : '' %>" required>
                         </label>
                         <label class="guest-field">
-                            <span>CAMPERS / MEMBERS</span>
+                            <span>CAMPERS / MEMBERS (MAX <%= roomCapacity %> PER ROOM)</span>
                             <select name="members" id="members" aria-label="Campers / Members" required>
-                                <option value="1">1 camper</option>
-                                <option value="2" selected>2 campers</option>
-                                <option value="3">3 campers</option>
-                                <option value="4">4 campers</option>
-                                <option value="5">5 campers</option>
-                                <option value="6">6 campers</option>
-                                <option value="7">7 campers</option>
-                                <option value="8">8 campers</option>
-                                <option value="9">9 campers</option>
-                                <option value="10">10 campers</option>
+                                <% const defaultSelected = Math.min(2, roomCapacity); %>
+                                <% for (let i = 1; i <= roomCapacity; i++) { %>
+                                    <option value="<%= i %>" <%= i === defaultSelected ? 'selected' : '' %>>
+                                        <%= i %> <%= i === 1 ? 'camper' : 'campers' %>
+                                    </option>
+                                <% } %>
                             </select>
                         </label>
                     </div>

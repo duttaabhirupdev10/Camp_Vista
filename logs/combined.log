@@ -74,3 +74,8 @@ C:\Users\DELL\OneDrive\Desktop\CampVista\models\campgroundModel.js:19:51
   18 try {
 → 19     const data = await prisma.campgrounds.findMany(
 The column `campgrounds.total_rooms` does not exist in the current database.
+[2026-11-12 13:44:37] info: Server is running on port 3000
+[2026-11-12 13:48:43] info: Server is running on port 3000
+[2026-11-12 13:49:13] info: Server is running on port 3000
+[2026-11-12 13:49:51] info: Server is running on port 3000
+[2026-11-12 13:56:39] info: Server is running on port 3000

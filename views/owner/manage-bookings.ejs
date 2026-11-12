@@ -81,35 +81,36 @@
         <% if (typeof campgrounds !== 'undefined' && campgrounds && campgrounds.length > 0) { %>
             <div class="row g-3">
                 <% for (let camp of campgrounds) { %>
-                    <%
-                        const avail = Number(camp.available_rooms ?? 0);
-                        const total = Number(camp.total_rooms ?? 5);
-                    %>
-                    <div class="col-md-6 col-lg-4">
-                        <div class="border rounded-3 p-3 bg-white h-100 d-flex flex-column justify-content-between gap-2">
-                            <div>
-                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                                    <h5 class="fw-bold mb-0" style="font-size: 15px;"><%= camp.title %></h5>
-                                    <a href="/campgrounds/<%= camp.id %>/edit" class="btn btn-outline btn-sm py-1 px-2" style="font-size: 11px;">Edit</a>
+                            <%
+                                const avail = Number(camp.available_rooms ?? 0);
+                                const total = Number(camp.total_rooms ?? 5);
+                                const cap = Math.max(1, Number(camp.room_capacity ?? 2));
+                            %>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="border rounded-3 p-3 bg-white h-100 d-flex flex-column justify-content-between gap-2">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                            <h5 class="fw-bold mb-0" style="font-size: 15px;"><%= camp.title %></h5>
+                                            <a href="/campgrounds/<%= camp.id %>/edit" class="btn btn-outline btn-sm py-1 px-2" style="font-size: 11px;">Edit</a>
+                                        </div>
+                                        <small class="text-muted d-block mb-2"><%= camp.location %></small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top flex-wrap gap-2">
+                                        <span class="text-muted small">Total: <strong><%= total %></strong> &middot; Max: <strong><%= cap %>/room</strong></span>
+                                        <% if (avail > 0) { %>
+                                            <span class="availability-badge available">
+                                                <i class="bi bi-door-open"></i>
+                                                <%= avail %> <%= avail === 1 ? 'room' : 'rooms' %> available
+                                            </span>
+                                        <% } else { %>
+                                            <span class="availability-badge sold-out">
+                                                <i class="bi bi-x-circle"></i>
+                                                No rooms available
+                                            </span>
+                                        <% } %>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block mb-2"><%= camp.location %></small>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                                <span class="text-muted small">Total: <strong><%= total %></strong></span>
-                                <% if (avail > 0) { %>
-                                    <span class="availability-badge available">
-                                        <i class="bi bi-door-open"></i>
-                                        <%= avail %> <%= avail === 1 ? 'room' : 'rooms' %> available
-                                    </span>
-                                <% } else { %>
-                                    <span class="availability-badge sold-out">
-                                        <i class="bi bi-x-circle"></i>
-                                        No rooms available
-                                    </span>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
                 <% } %>
             </div>
         <% } else { %>
