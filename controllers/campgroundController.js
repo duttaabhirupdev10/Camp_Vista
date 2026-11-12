@@ -1,11 +1,24 @@
 const campgroundService = require('../services/campgroundService');
 
+function parseCampgroundFields(payload) {
+    if (!payload) return;
+    if (payload.price !== undefined && payload.price !== '') {
+        payload.price = parseFloat(payload.price);
+    }
+    if (payload.total_rooms !== undefined && payload.total_rooms !== '') {
+        const parsedRooms = parseInt(payload.total_rooms, 10);
+        payload.total_rooms = Number.isNaN(parsedRooms) ? 5 : Math.max(0, parsedRooms);
+    }
+}
+
 const campgroundController = {
     async index(req, res) {
         try {
             const filters = {
                 search: req.query.search || '',
-                maxPrice: req.query.maxPrice || ''
+                maxPrice: req.query.maxPrice || '',
+                check_in: req.query.check_in || '',
+                check_out: req.query.check_out || ''
             };
             const campgrounds = await campgroundService.listCampgrounds(filters);
             res.render('campgrounds/index', { campgrounds, filters });
@@ -39,10 +52,7 @@ const campgroundController = {
 
             const ownerId = res.locals.currentUser ? res.locals.currentUser.id : req.auth.userId;
             
-            // Convert price to number
-            if (req.body.campground && req.body.campground.price) {
-                req.body.campground.price = parseFloat(req.body.campground.price);
-            }
+            parseCampgroundFields(req.body.campground);
 
             const campground = await campgroundService.createCampground(req.body.campground, ownerId);
             res.redirect(`/campgrounds/${campground.id}`);
@@ -53,11 +63,36 @@ const campgroundController = {
     },
 
     async show(req, res) {
-        const { data: campground, error } = await campgroundService.getCampground(req.params.id);
+        const selectedDates = {
+            check_in: req.query.check_in || '',
+            check_out: req.query.check_out || ''
+        };
+        const { data: campground, error } = await campgroundService.getCampground(req.params.id, selectedDates);
         if (error || !campground) return res.send('Campground not found');
 
         campground._id = campground.id;
-        res.render('campgrounds/show', { campground });
+        res.render('campgrounds/show', {
+            campground,
+            selectedDates,
+            bookingError: req.query.error || null
+        });
+    },
+
+    async checkAvailability(req, res) {
+        try {
+            const { data, error } = await campgroundService.getAvailability(
+                req.params.id,
+                req.query.check_in,
+                req.query.check_out
+            );
+            if (error || !data) {
+                return res.status(404).json({ error: 'Campground not found' });
+            }
+            return res.json(data);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Unable to check room availability' });
+        }
     },
 
     async editForm(req, res) {
@@ -86,9 +121,7 @@ const campgroundController = {
                 req.body.campground.qr_code = qrUrl;
             }
 
-            if (req.body.campground && req.body.campground.price) {
-                req.body.campground.price = parseFloat(req.body.campground.price);
-            }
+            parseCampgroundFields(req.body.campground);
             const campground = await campgroundService.updateCampground(req.params.id, req.body.campground);
             res.redirect(`/campgrounds/${campground.id}`);
         } catch (error) {

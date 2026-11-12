@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const { computeAvailability } = require('../utils/availability');
 
 const bookingModel = {
     async create(booking) {
@@ -10,6 +11,50 @@ const bookingModel = {
             return { data, error: null };
         } catch (error) {
             return { data: null, error };
+        }
+    },
+
+    async createIfRoomAvailable(booking) {
+        try {
+            const result = await prisma.$transaction(async (tx) => {
+                const campground = await tx.campgrounds.findUnique({
+                    where: { id: booking.campground_id },
+                    include: {
+                        bookings: {
+                            where: { status: { not: 'cancelled' } },
+                            select: { id: true, status: true, check_in: true, check_out: true }
+                        }
+                    }
+                });
+
+                if (!campground) {
+                    return { notFound: true };
+                }
+
+                const availability = computeAvailability(
+                    campground,
+                    campground.bookings,
+                    booking.check_in,
+                    booking.check_out
+                );
+
+                if (availability.available_rooms <= 0) {
+                    return { unavailable: true };
+                }
+
+                const created = await tx.bookings.create({ data: booking });
+                return { data: created, unavailable: false };
+            });
+
+            if (result.notFound) {
+                return { data: null, error: new Error('Campground not found'), unavailable: false };
+            }
+            if (result.unavailable) {
+                return { data: null, error: null, unavailable: true };
+            }
+            return { data: result.data, error: null, unavailable: false };
+        } catch (error) {
+            return { data: null, error, unavailable: false };
         }
     },
 

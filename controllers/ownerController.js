@@ -1,4 +1,5 @@
 const bookingModel = require('../models/bookingModel');
+const campgroundService = require('../services/campgroundService');
 const mailer = require('../utils/mailer');
 
 const ownerController = {
@@ -9,13 +10,16 @@ const ownerController = {
             }
 
             const isAdmin = res.locals.currentUser.role === 'admin';
-            const { data: bookings, error } = isAdmin
-                ? await bookingModel.findAllBookings()
-                : await bookingModel.findBookingsByOwnerId(res.locals.currentUser.id);
+            const [{ data: bookings, error }, campgrounds] = await Promise.all([
+                isAdmin
+                    ? bookingModel.findAllBookings()
+                    : bookingModel.findBookingsByOwnerId(res.locals.currentUser.id),
+                campgroundService.listCampgrounds(isAdmin ? {} : { ownerId: res.locals.currentUser.id })
+            ]);
 
             if (error) throw error;
 
-            res.render('owner/manage-bookings', { bookings, isAdmin });
+            res.render('owner/manage-bookings', { bookings, campgrounds, isAdmin });
         } catch (error) {
             console.error(error);
             res.send('Error fetching bookings');

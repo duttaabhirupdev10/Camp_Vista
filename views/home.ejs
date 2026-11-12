@@ -35,7 +35,7 @@
                         <rect x="3" y="5" width="18" height="16" rx="2" />
                         <path d="M16 3v4M8 3v4M3 10h18" />
                     </svg>
-                    <input type="date" aria-label="Check in">
+                    <input type="date" name="check_in" aria-label="Check in">
                 </div>
             </label>
 
@@ -46,7 +46,7 @@
                         <rect x="3" y="5" width="18" height="16" rx="2" />
                         <path d="M16 3v4M8 3v4M3 10h18" />
                     </svg>
-                    <input type="date" aria-label="Check out">
+                    <input type="date" name="check_out" aria-label="Check out">
                 </div>
             </label>
 
@@ -219,6 +219,20 @@
                                 </svg>
                                 <%= camp.location %>
                             </p>
+                            <div class="camp-availability">
+                                <% const availRooms = Number(camp.available_rooms ?? 0); %>
+                                <% if (availRooms > 0) { %>
+                                    <span class="availability-badge available">
+                                        <i class="bi bi-door-open"></i>
+                                        <%= availRooms %> <%= availRooms === 1 ? 'room' : 'rooms' %> available
+                                    </span>
+                                <% } else { %>
+                                    <span class="availability-badge sold-out">
+                                        <i class="bi bi-x-circle"></i>
+                                        No rooms available
+                                    </span>
+                                <% } %>
+                            </div>
                             <div class="card-foot">
                                 <div>
                                     <strong>₹<%= camp.price ? Number(camp.price).toLocaleString('en-IN') : 0 %></strong>

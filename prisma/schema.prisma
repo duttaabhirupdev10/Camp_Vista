@@ -21,6 +21,7 @@ model campgrounds {
   title       String
   location    String
   price       Float
+  total_rooms Int        @default(5)
   image       String?
   qr_code     String?
   description String?

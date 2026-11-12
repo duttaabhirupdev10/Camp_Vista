@@ -40,6 +40,12 @@
                     </div>
 
                     <div class="mb-4">
+                        <label for="total_rooms" class="form-label">Total Rooms</label>
+                        <input type="number" class="form-control" id="total_rooms" name="campground[total_rooms]" value="<%= (campground.total_rooms !== undefined && campground.total_rooms !== null) ? campground.total_rooms : 5 %>" min="0" required>
+                        <div class="form-text text-muted small">Total rooms or tents at this property (set to 0 if no rooms are available).</div>
+                    </div>
+
+                    <div class="mb-4">
                         <label for="image" class="form-label">Update Cover Photo (leave blank to keep current)</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
                         <% if (campground.image) { %>

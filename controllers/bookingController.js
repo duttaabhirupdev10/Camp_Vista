@@ -1,5 +1,6 @@
 const bookingModel = require('../models/bookingModel');
 const campgroundModel = require('../models/campgroundModel');
+const campgroundService = require('../services/campgroundService');
 
 const bookingController = {
     async showPaymentPage(req, res) {
@@ -10,6 +11,14 @@ const bookingController = {
 
             const { data: campground, error: campError } = await campgroundModel.findById(campgroundId);
             if (campError || !campground) return res.status(404).send('Campground not found');
+
+            const { data: availability } = await campgroundService.getAvailability(campgroundId, check_in, check_out);
+            if (!availability || availability.available_rooms <= 0) {
+                const params = new URLSearchParams({ error: 'no_rooms' });
+                if (check_in) params.set('check_in', check_in);
+                if (check_out) params.set('check_out', check_out);
+                return res.redirect(`/campgrounds/${campgroundId}?${params.toString()}`);
+            }
 
             let nights = 1;
             if (check_in && check_out) {
@@ -58,7 +67,13 @@ const bookingController = {
                 status: 'pending'
             };
 
-            const { error: bookingError } = await bookingModel.create(booking);
+            const { error: bookingError, unavailable } = await bookingModel.createIfRoomAvailable(booking);
+            if (unavailable) {
+                const params = new URLSearchParams({ error: 'no_rooms' });
+                if (check_in) params.set('check_in', check_in);
+                if (check_out) params.set('check_out', check_out);
+                return res.redirect(`/campgrounds/${campgroundId}?${params.toString()}`);
+            }
             if (bookingError) throw bookingError;
 
             // In-app notification handles owner awareness now

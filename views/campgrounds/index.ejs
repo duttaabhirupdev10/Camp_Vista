@@ -23,6 +23,28 @@
         </label>
 
         <label>
+            <span>Check in</span>
+            <div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 10h18" />
+                </svg>
+                <input type="date" name="check_in" value="<%= filters.check_in || '' %>" aria-label="Check in">
+            </div>
+        </label>
+
+        <label>
+            <span>Check out</span>
+            <div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="16" rx="2" />
+                    <path d="M16 3v4M8 3v4M3 10h18" />
+                </svg>
+                <input type="date" name="check_out" value="<%= filters.check_out || '' %>" aria-label="Check out">
+            </div>
+        </label>
+
+        <label>
             <span>Max Price (₹)</span>
             <div>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -33,17 +55,19 @@
             </div>
         </label>
 
-        <button type="submit" class="btn btn-primary">
-            Search
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-            </svg>
-        </button>
+        <div class="d-flex align-items-center gap-2">
+            <button type="submit" class="btn btn-primary">
+                Search
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m20 20-4-4" />
+                </svg>
+            </button>
 
-        <% if (filters.search || filters.maxPrice) { %>
-            <a href="/campgrounds" class="btn btn-ghost" title="Clear search">Clear</a>
-        <% } %>
+            <% if (filters.search || filters.maxPrice || filters.check_in || filters.check_out) { %>
+                <a href="/campgrounds" class="btn btn-ghost" title="Clear search">Clear</a>
+            <% } %>
+        </div>
     </form>
 
     <!-- Filters & Action Bar -->
@@ -112,12 +136,33 @@
                             </p>
                         <% } %>
 
+                        <div class="camp-availability">
+                            <% const availRooms = Number(campground.available_rooms ?? 0); %>
+                            <% if (availRooms > 0) { %>
+                                <span class="availability-badge available">
+                                    <i class="bi bi-door-open"></i>
+                                    <%= availRooms %> <%= availRooms === 1 ? 'room' : 'rooms' %> available
+                                </span>
+                            <% } else { %>
+                                <span class="availability-badge sold-out">
+                                    <i class="bi bi-x-circle"></i>
+                                    No rooms available
+                                </span>
+                            <% } %>
+                        </div>
+
+                        <%
+                            const dateParams = new URLSearchParams();
+                            if (filters && filters.check_in) dateParams.set('check_in', filters.check_in);
+                            if (filters && filters.check_out) dateParams.set('check_out', filters.check_out);
+                            const dateQuery = dateParams.toString() ? `?${dateParams.toString()}` : '';
+                        %>
                         <div class="card-foot">
                             <div>
                                 <strong>₹<%= campground.price ? Number(campground.price).toLocaleString('en-IN') : 0 %></strong>
                                 <span> / night</span>
                             </div>
-                            <a href="/campgrounds/<%= campground.id || campground._id %>">
+                            <a href="/campgrounds/<%= campground.id || campground._id %><%= dateQuery %>">
                                 View details
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M5 12h14M13 6l6 6-6 6" />

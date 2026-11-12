@@ -11,6 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get('/', isLoggedIn, campgroundController.index);
 router.get('/new', isLoggedIn, isRole('admin', 'owner'), campgroundController.newForm);
 router.post('/', isLoggedIn, isRole('admin', 'owner'), upload.fields([{ name: 'image', maxCount: 1 }, { name: 'qr_code', maxCount: 1 }]), campgroundController.create);
+router.get('/:id/availability', campgroundController.checkAvailability);
 router.get('/:id', isLoggedIn, campgroundController.show);
 router.get('/:id/edit', isLoggedIn, isOwner, campgroundController.editForm);
 router.put('/:id', isLoggedIn, isOwner, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'qr_code', maxCount: 1 }]), campgroundController.update);

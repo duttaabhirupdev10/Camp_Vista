@@ -46,3 +46,31 @@
 [2026-10-13 14:36:00] info: Server is running on port 3000
 [2026-10-13 14:37:14] info: Server is running on port 3000
 [2026-10-13 14:44:04] info: Server is running on port 3000
+[2026-11-12 13:32:29] info: Server is running on port 3000
+[2026-11-12 13:33:07] error: Error loading campgrounds for home: PrismaClientKnownRequestError: 
+Invalid `prisma.campgrounds.findMany()` invocation in
+C:\Users\DELL\OneDrive\Desktop\CampVista\models\campgroundModel.js:19:51
+
+  16     where.owner = filters.ownerId;
+  17 }
+  18 try {
+→ 19     const data = await prisma.campgrounds.findMany(
+The column `campgrounds.total_rooms` does not exist in the current database.
+[2026-11-12 13:33:36] error: Error loading campgrounds for home: PrismaClientKnownRequestError: 
+Invalid `prisma.campgrounds.findMany()` invocation in
+C:\Users\DELL\OneDrive\Desktop\CampVista\models\campgroundModel.js:19:51
+
+  16     where.owner = filters.ownerId;
+  17 }
+  18 try {
+→ 19     const data = await prisma.campgrounds.findMany(
+The column `campgrounds.total_rooms` does not exist in the current database.
+[2026-11-12 13:34:05] error: Error loading campgrounds for home: PrismaClientKnownRequestError: 
+Invalid `prisma.campgrounds.findMany()` invocation in
+C:\Users\DELL\OneDrive\Desktop\CampVista\models\campgroundModel.js:19:51
+
+  16     where.owner = filters.ownerId;
+  17 }
+  18 try {
+→ 19     const data = await prisma.campgrounds.findMany(
+The column `campgrounds.total_rooms` does not exist in the current database.

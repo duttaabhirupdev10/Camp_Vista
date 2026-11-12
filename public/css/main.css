@@ -685,6 +685,47 @@ h1 em, h2 em {
   color: var(--forest-2);
 }
 
+/* Room Availability Badges */
+.camp-availability {
+  margin-bottom: 14px;
+}
+
+.availability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.availability-badge.available {
+  background: #e3f3e9;
+  color: #166534;
+  border: 1px solid #c3e4cf;
+}
+
+.availability-badge.sold-out {
+  background: #fde8e8;
+  color: #a82828;
+  border: 1px solid #f6c6c6;
+}
+
+.booking-availability-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f7f9f7;
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+
 /* Why Section */
 .why-section {
   display: grid;

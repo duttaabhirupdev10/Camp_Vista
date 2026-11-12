@@ -40,6 +40,12 @@
                     </div>
 
                     <div class="mb-4">
+                        <label for="total_rooms" class="form-label">Total Rooms Available</label>
+                        <input type="number" class="form-control" id="total_rooms" name="campground[total_rooms]" placeholder="5" min="0" value="5" required>
+                        <div class="form-text text-muted small">Number of rooms or tents available for booking at this property (set to 0 if none).</div>
+                    </div>
+
+                    <div class="mb-4">
                         <label for="image" class="form-label">Camp Cover Photo</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
                         <div class="form-text text-muted small">Upload high-resolution landscape images of your campsite.</div>

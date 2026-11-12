@@ -12,8 +12,19 @@ const campgroundModel = {
         if (filters.maxPrice) {
             where.price = { lte: parseFloat(filters.maxPrice) };
         }
+        if (filters.ownerId) {
+            where.owner = filters.ownerId;
+        }
         try {
-            const data = await prisma.campgrounds.findMany({ where });
+            const data = await prisma.campgrounds.findMany({
+                where,
+                include: {
+                    bookings: {
+                        where: { status: { not: 'cancelled' } },
+                        select: { id: true, status: true, check_in: true, check_out: true }
+                    }
+                }
+            });
             return { data, error: null };
         } catch (error) {
             return { data: null, error };
@@ -23,6 +34,23 @@ const campgroundModel = {
     async findById(id) {
         try {
             const data = await prisma.campgrounds.findUnique({ where: { id } });
+            return { data, error: null };
+        } catch (error) {
+            return { data: null, error };
+        }
+    },
+
+    async findByIdWithBookings(id) {
+        try {
+            const data = await prisma.campgrounds.findUnique({
+                where: { id },
+                include: {
+                    bookings: {
+                        where: { status: { not: 'cancelled' } },
+                        select: { id: true, status: true, check_in: true, check_out: true }
+                    }
+                }
+            });
             return { data, error: null };
         } catch (error) {
             return { data: null, error };
