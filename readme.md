@@ -13,7 +13,9 @@ CampVista is a modern, full-stack campground booking and review platform. It con
 * **User Authentication:** Secure signup and login powered by Clerk.
 * **Role-Based Access Control:** Distinct roles for Customers, Campground Owners, and Admins.
 * **Interactive Maps:** View campgrounds on a map, get distances from your current location, and instantly launch Google Maps directions.
-* **Booking Engine:** Select check-in/check-out dates, calculate dynamic pricing, and manage booking statuses.
+* **Room Availability & Capacity Tracking:** Owners define total rooms (`total_rooms`) and maximum guests allowed per room (`room_capacity`) when registering or editing a property. Listings display live date-based room counts (and clearly indicate when no rooms are available).
+* **Booking Engine:** Select check-in/check-out dates, enforce per-room guest limits, calculate dynamic pricing, and reserve rooms safely with transactional availability checks (`createIfRoomAvailable`).
+* **Owner Dashboard:** Hosts can monitor property room availability alongside customer reservation requests and approve or reject bookings.
 * **QR Code Payments:** Owners can upload their personal UPI/Payment QR codes for customers to scan and pay directly.
 * **Reviews & Ratings:** Users can leave authentic reviews and ratings for campgrounds they've visited.
 * **Cloud Storage:** High-performance, S3-compatible cloud storage for campground images and QR codes.
@@ -34,46 +36,59 @@ CampVista is a modern, full-stack campground booking and review platform. It con
 
 ## 🏗️ High-Level Design (HLD)
 
-The architecture follows a modern, stateless backend pattern with managed external services for database, authentication, and file storage.
+The architecture follows a stateless, layered MVC + Service backend pattern with managed external services for database, authentication, and object storage.
 
 ```mermaid
 flowchart TD
-    subgraph Frontend [Frontend]
-        Client[Client / Web Browser]
+    subgraph Frontend ["Frontend"]
+        Client["Client / Web Browser (EJS + Bootstrap + Live Availability Fetch)"]
     end
 
-    subgraph ExternalAPIs [External APIs]
-        Clerk[Clerk Authentication]
-        OSM[OpenStreetMap / Leaflet]
-        Google[Google Maps Directions]
+    subgraph ExternalAPIs ["External APIs"]
+        Clerk["Clerk Authentication"]
+        OSM["OpenStreetMap / Leaflet"]
+        Google["Google Maps Directions"]
     end
 
-    subgraph CloudInfrastructure [Cloud Infrastructure - Render]
-        NodeApp[Node.js + Express Server]
+    subgraph CloudInfrastructure ["Application Server (Render / Node.js + Express)"]
+        Routes["Express Routes & Role/Owner Middleware"]
+        Controllers["Controllers (Campground, Booking, Owner, Review, Auth)"]
+        Service["Campground Service & Availability Engine (utils/availability.js)"]
+        Models["Prisma Models & Transactional Booking Guard"]
     end
 
-    subgraph DataStorage [Data & Storage - Neon]
-        Postgres[(Neon PostgreSQL)]
-        S3Bucket[(Neon S3 Storage)]
+    subgraph DataStorage ["Data & Storage (Neon)"]
+        Postgres[("Neon PostgreSQL (users, campgrounds, bookings, reviews)")]
+        S3Bucket[("Neon S3 Storage (Camp Images & UPI QRs)")]
     end
 
-    %% Connections
-    Client -- "1. HTTP / Web Traffic" --> NodeApp
+    %% Client & External API flows
+    Client -- "1. HTTP Requests & Live Availability API" --> Routes
     Client -- "2. Auth Flow" --> Clerk
-    Client -- "3. Fetch Map Tiles" --> OSM
+    Client -- "3. Map Tiles & Geocoding" --> OSM
     Client -- "4. Open Directions" --> Google
 
-    NodeApp -- "5. Verify Webhooks/Tokens" --> Clerk
-    NodeApp -- "6. Read/Write Data (Prisma)" --> Postgres
-    NodeApp -- "7. Upload Images/QRs (AWS SDK)" --> S3Bucket
+    %% Backend Layered Flow
+    Routes -- "5. Auth & Role Check" --> Controllers
+    Controllers -- "6. Compute Date Availability & Capacity" --> Service
+    Service -- "7. Query Properties & Active Bookings" --> Models
+    Controllers -- "8. Transactional Booking Check" --> Models
+
+    %% Persistence & External Integrations
+    Routes -- "9. Verify Clerk Session" --> Clerk
+    Models -- "10. Prisma ORM Read/Write" --> Postgres
+    Controllers -- "11. Upload Images & QRs (AWS SDK)" --> S3Bucket
 ```
 
 ### Components:
-1. **Client Browser:** Renders EJS views, handles user geolocation, and interfaces directly with Clerk for auth states.
-2. **Node.js/Express Server (Render):** The core routing logic. It is entirely stateless, relying on external services for persistence.
-3. **Clerk:** Manages users, sessions, and passwords securely. 
-4. **Neon PostgreSQL:** The primary relational database containing `users`, `campgrounds`, `bookings`, and `reviews`.
-5. **Neon S3 Storage:** A robust object storage bucket holding all user-uploaded images and QR codes.
+1. **Client Browser:** Renders EJS views, handles user geolocation, queries `GET /campgrounds/:id/availability` dynamically when dates change, enforces per-room guest selector limits, and interfaces with Clerk for auth states.
+2. **Routes & Middleware (`routes/`, `middleware/`):** Handles authentication (`isLoggedIn`), role checks (`isRole`), and property ownership checks (`isOwner`).
+3. **Controllers (`controllers/`):** Processes requests for properties, bookings (`showPaymentPage` and `confirmPayment` validate `room_capacity` and room availability), reviews, and the host management dashboard (`ownerController`).
+4. **Service & Availability Engine (`services/campgroundService.js`, `utils/availability.js`):** Resolves date ranges (`[check_in, check_out)` or default `[today, tomorrow)`), detects overlapping non-cancelled bookings, and computes `available_rooms` and `booked_rooms` against `total_rooms` and `room_capacity`.
+5. **Models & Transactions (`models/`):** Interfaces with PostgreSQL via Prisma ORM, including `bookingModel.createIfRoomAvailable` which wraps availability verification and booking creation in a database transaction (`prisma.$transaction`) to prevent overbooking.
+6. **Clerk:** Manages users, sign-in/sign-up widgets, and session tokens.
+7. **Neon PostgreSQL:** Primary relational database containing `users`, `campgrounds` (including `total_rooms` and `room_capacity`), `bookings`, and `reviews`, with startup schema verification in `app.js`.
+8. **Neon S3 Storage:** Object storage bucket holding uploaded campground cover images and host UPI QR codes.
 
 ---
 
